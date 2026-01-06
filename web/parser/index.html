@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PDF Ingestion</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <header class="header">
+    <h1>PDF Ingestion</h1>
+  </header>
+  
+  <main class="container">
+    <!-- Left Panel: PDF Viewer -->
+    <section class="panel panel-left">
+      <div id="drop-zone" class="drop-zone">
+        <p>Drag & drop PDF here</p>
+        <p>or</p>
+        <input type="file" id="file-input" accept=".pdf" />
+      </div>
+      
+      <div id="pdf-viewer" class="pdf-viewer hidden">
+        <div id="pdf-pages" class="pdf-pages">
+          <!-- Canvas elements rendered here -->
+        </div>
+      </div>
+    </section>
+    
+    <!-- Right Panel: JSON Chunks -->
+    <section class="panel panel-right">
+      <h2>Extracted Chunks</h2>
+      <div id="chunks-container" class="chunks-container">
+        <p class="placeholder">Upload a PDF to see chunks</p>
+      </div>
+    </section>
+  </main>
+
+  <script src="lib/pdf.min.js"></script>
+  <script src="js/main.js" type="module"></script>
+</body>
+</html>
