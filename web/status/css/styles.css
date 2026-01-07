@@ -1,0 +1,310 @@
+/* Reset & Variables */
+:root {
+    /* Palette: Light Mode (Default) */
+    --bg-body: #ffffff;
+    --bg-surface: #ffffff;
+    --bg-header-group: #f8f9fa; 
+    --bg-header-col: #ffffff;
+    --bg-col-group-alt: #f2f2f5; 
+    
+    --text-primary: #111111; 
+    --text-secondary: #595959; 
+    --text-tertiary: #949494; 
+    
+    --border-color: #e6e6e6; 
+    --row-hover: #f0f0f4;
+    
+    --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-mono: "SF Mono", "Menlo", "Monaco", "Consolas", "Courier New", monospace;
+    
+    --header-group-height: 48px;
+    --transition-speed: 0.3s;
+    
+    /* Status Colors */
+    --status-positive: #10b981; /* Green */
+    --status-active: #3b82f6; /* Blue */
+    --status-warning: #f59e0b; /* Amber */
+    --status-critical: #ef4444; /* Red */
+    --status-neutral: #9ca3af; /* Grey */
+}
+
+[data-theme="dark"] {
+    /* Palette: Dark Mode */
+    --bg-body: #111111;
+    --bg-surface: #1a1a1a;
+    --bg-header-group: #1f1f1f;
+    --bg-header-col: #111111;
+    --bg-col-group-alt: #1a1a1c; /* Slightly lighter/tinted for stripes */
+    
+    --text-primary: #f0f0f0;
+    --text-secondary: #a0a0a0;
+    --text-tertiary: #666666;
+    
+    --border-color: #333333;
+    --row-hover: #252525;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-sans);
+    color: var(--text-primary);
+    background-color: var(--bg-body);
+    -webkit-font-smoothing: antialiased;
+    transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
+}
+
+/* Layout Wrapper */
+.table-container {
+    padding-top: 0; 
+    margin-top: 60px; 
+    height: calc(100vh - 60px);
+}
+
+/* Controls Header */
+.controls-placeholder {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: var(--bg-surface); /* Solid background to hide scrolling content */
+    border-bottom: 1px solid var(--border-color);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Search left, Toggle right */
+    padding: 0 24px;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.search-container {
+    flex: 1;
+}
+
+.placeholder-text {
+    color: var(--text-tertiary);
+    font-size: 14px;
+}
+
+/* Theme Toggle Button */
+.theme-toggle {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    transition: color 0.2s ease, background-color 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.theme-toggle:hover {
+    background-color: var(--row-hover);
+    color: var(--text-primary);
+}
+
+.theme-toggle .icon-moon { display: none; }
+.theme-toggle .icon-sun { display: block; }
+
+[data-theme="dark"] .theme-toggle .icon-moon { display: block; }
+[data-theme="dark"] .theme-toggle .icon-sun { display: none; }
+
+
+/* Scrollbar Refinement */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 5px;
+    border: 2px solid var(--bg-body); 
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--text-tertiary);
+}
+
+/* Table Architecture */
+table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 13px; 
+    line-height: 1.5;
+    white-space: nowrap; 
+}
+
+/* Column Group Coloring (Vertical Zebra) */
+.group-investigation,
+.group-itrack,
+.group-time {
+    background-color: var(--bg-col-group-alt);
+    transition: background-color var(--transition-speed) ease;
+}
+
+/* Headers */
+thead th {
+    position: sticky;
+    z-index: 10;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+    transition: background-color var(--transition-speed) ease, border-color var(--transition-speed) ease, color var(--transition-speed) ease;
+}
+
+/* Row 1: Group Headers */
+thead tr:first-child th {
+    top: 0;
+    height: var(--header-group-height);
+    background-color: var(--bg-header-col); /* Match standard column background for continuity */
+    color: var(--text-primary); /* Promoted to primary color */
+    font-weight: 800; /* Title weight */
+    font-size: 14px;
+    padding: 0 16px; 
+    text-align: center; /* Center alignment for groups */
+    vertical-align: middle;
+    border-right: 1px solid var(--border-color); 
+    white-space: nowrap;
+}
+
+/* Row 2: Column Headers */
+thead tr:nth-child(2) th {
+    top: var(--header-group-height); 
+    background-color: var(--bg-header-col);
+    color: var(--text-primary); /* Match primary contrast */
+    font-weight: 700; /* Bold, but smaller than titles */
+    padding: 12px 16px;
+    border-bottom: 2px solid var(--border-color); 
+    font-size: 12px;
+}
+
+/* Explicitly color the headers that sit above striped columns */
+/* Now targeting both rows to extend the stripe to the very top */
+thead tr:first-child th.th-alt,
+thead tr:nth-child(2) th.th-alt {
+    background-color: var(--bg-col-group-alt);
+}
+
+/* Body Cells */
+td {
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    transition: color 0.15s ease, border-color 0.3s ease;
+    background-color: transparent; 
+}
+
+/* Interaction */
+tbody tr {
+    transition: background-color 0.1s ease;
+}
+
+tbody tr:hover {
+    background-color: var(--row-hover); 
+}
+
+tbody tr:hover td {
+    color: var(--text-primary); 
+}
+
+/* Typography Details */
+td:nth-child(1), 
+td:nth-child(2), 
+td:nth-child(6), 
+td:nth-child(14), 
+td:nth-child(17), 
+td:nth-child(20) { 
+    font-family: var(--font-mono);
+    font-size: 12px;
+}
+
+/* Sticky First Column (DR Number) */
+/* Header Row 2, Cell 1 */
+thead tr:nth-child(2) th:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 20; /* Higher than regular headers */
+    background-color: var(--bg-header-col); /* Ensure opacity */
+    border-right: 1px solid var(--border-color); /* Separation seam */
+    box-shadow: 4px 0 8px -4px rgba(0,0,0,0.1); /* Subtle drop shadow for depth */
+}
+
+/* Body Row, Cell 1 */
+tbody td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 5; /* Above scrollable content */
+    background-color: var(--bg-body); /* Must match row bg to hide content behind */
+    border-right: 1px solid var(--border-color);
+    box-shadow: 4px 0 8px -4px rgba(0,0,0,0.1);
+}
+
+/* Fix for hover state on sticky column */
+tbody tr:hover td:first-child {
+    background-color: var(--row-hover);
+}
+
+/* Status Indicators */
+/* We target cells that have a data-status attribute (added via JS) */
+td[data-status] {
+    padding-left: 24px; /* Make room for the dot */
+    position: relative;
+}
+
+td[data-status]::before {
+    content: '';
+    position: absolute;
+    left: 8px; /* Position inside the padding */
+    top: 50%;
+    transform: translateY(-50%);
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--status-neutral); /* Default */
+}
+
+/* Status Mappings */
+td[data-status="open"]::before,
+td[data-status="active"]::before,
+td[data-status="in-progress"]::before,
+td[data-status="investigating"]::before,
+td[data-status="new"]::before {
+    background-color: var(--status-active);
+}
+
+td[data-status="resolved"]::before,
+td[data-status="closed"]::before,
+td[data-status="fixed"]::before,
+td[data-status="done"]::before,
+td[data-status="approved"]::before,
+td[data-status="verified"]::before {
+    background-color: var(--status-positive);
+}
+
+td[data-status="bug"]::before,
+td[data-status="escalated"]::before,
+td[data-status="rejected"]::before {
+    background-color: var(--status-critical);
+}
+
+td[data-status="pending"]::before,
+td[data-status="review"]::before,
+td[data-status="waiting-for-dev"]::before {
+    background-color: var(--status-warning);
+}
+
+td:nth-child(3), 
+td:nth-child(11), 
+td:nth-child(15), 
+td:nth-child(18), 
+td:nth-child(22) { 
+    font-weight: 500;
+}
