@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Status Report</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Future controls/search area will go here -->
+    <div class="controls-placeholder">
+        <div class="search-container">
+            <!-- Placeholder for Fuzzy Search -->
+            <span class="placeholder-text">Search...</span>
+        </div>
+        <button id="theme-toggle" class="theme-toggle" aria-label="Toggle Dark Mode">
+            <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        </button>
+    </div>
+
+    <div class="table-container">
+        <table>
+            <!-- Column Grouping for Vertical Rhythm -->
+            <colgroup>
+                <col span="9" class="group-origin">
+                <col span="4" class="group-investigation">
+                <col span="3" class="group-req">
+                <col span="3" class="group-itrack">
+                <col span="4" class="group-jira">
+                <col span="4" class="group-time">
+            </colgroup>
+            <thead>
+                <tr>
+                    <th colspan="9">Originating CTR</th>
+                    <th colspan="4" class="th-alt">SW Investigation</th>
+                    <th colspan="3">IE/Thinspec Request</th>
+                    <th colspan="3" class="th-alt">ITRACK Record</th>
+                    <th colspan="4">Jira Story</th>
+                    <th colspan="4" class="th-alt">Time Line</th>
+                </tr>
+                <tr>
+                    <th>DR Number</th>
+                    <th>CTR Number</th>
+                    <th>CTR Status</th>
+                    <th>Summary</th>
+                    <th>Defect Type</th>
+                    <th>PTR Number</th>
+                    <th>Version Detected</th>
+                    <th>Version Introduced</th>
+                    <th>Version Planned</th>
+                    <th class="th-alt">Support Issues</th>
+                    <th class="th-alt">Support Status</th>
+                    <th class="th-alt">Support Detailed Status</th>
+                    <th class="th-alt">Support Last Update</th>
+                    <th>IE Request ID</th>
+                    <th>IE Status</th>
+                    <th>IE Last Update</th>
+                    <th class="th-alt">ITRACK ID</th>
+                    <th class="th-alt">ITRACK Status</th>
+                    <th class="th-alt">ITRACK Last Update</th>
+                    <th>STARS ID</th>
+                    <th>STARS Issue Type</th>
+                    <th>STARS Status</th>
+                    <th>STARS Last Update</th>
+                    <th class="th-alt">Created Date</th>
+                    <th class="th-alt">Support Create Date</th>
+                    <th class="th-alt">IE Created</th>
+                    <th class="th-alt">STARS Created</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Example Data Row for Visualization -->
+                <tr>
+                    <td>DR-2024-001</td>
+                    <td>CTR-9928</td>
+                    <td>Open</td>
+                    <td>Memory leak in rendering pipeline</td>
+                    <td>Performance</td>
+                    <td>PTR-1102</td>
+                    <td>v2.1.0</td>
+                    <td>v2.0.0</td>
+                    <td>v2.1.1</td>
+                    <td>SI-882</td>
+                    <td>Active</td>
+                    <td>Investigating</td>
+                    <td>2024-01-15</td>
+                    <td>IE-229</td>
+                    <td>Pending</td>
+                    <td>2024-01-10</td>
+                    <td>IT-992</td>
+                    <td>Logged</td>
+                    <td>2024-01-12</td>
+                    <td>STR-001</td>
+                    <td>Bug</td>
+                    <td>New</td>
+                    <td>2024-01-05</td>
+                    <td>2024-01-01</td>
+                    <td>2024-01-02</td>
+                    <td>2024-01-03</td>
+                    <td>2024-01-04</td>
+                </tr>
+                 <tr>
+                    <td>DR-2024-002</td>
+                    <td>CTR-9929</td>
+                    <td>Closed</td>
+                    <td>UI misalignment on dashboard</td>
+                    <td>Cosmetic</td>
+                    <td>PTR-1103</td>
+                    <td>v2.1.0</td>
+                    <td>v2.1.0</td>
+                    <td>v2.1.1</td>
+                    <td>SI-883</td>
+                    <td>Resolved</td>
+                    <td>Fixed</td>
+                    <td>2024-01-16</td>
+                    <td>IE-230</td>
+                    <td>Approved</td>
+                    <td>2024-01-11</td>
+                    <td>IT-993</td>
+                    <td>Verified</td>
+                    <td>2024-01-13</td>
+                    <td>STR-002</td>
+                    <td>Task</td>
+                    <td>Done</td>
+                    <td>2024-01-06</td>
+                    <td>2024-01-02</td>
+                    <td>2024-01-03</td>
+                    <td>2024-01-04</td>
+                    <td>2024-01-05</td>
+                </tr>
+                 <tr>
+                    <td>DR-2024-003</td>
+                    <td>CTR-9930</td>
+                    <td>In Progress</td>
+                    <td>API timeout on heavy load</td>
+                    <td>Backend</td>
+                    <td>PTR-1104</td>
+                    <td>v2.0.5</td>
+                    <td>v1.9.0</td>
+                    <td>v2.2.0</td>
+                    <td>SI-884</td>
+                    <td>Escalated</td>
+                    <td>Waiting for Dev</td>
+                    <td>2024-01-17</td>
+                    <td>IE-231</td>
+                    <td>Review</td>
+                    <td>2024-01-12</td>
+                    <td>IT-994</td>
+                    <td>In Progress</td>
+                    <td>2024-01-14</td>
+                    <td>STR-003</td>
+                    <td>Bug</td>
+                    <td>Open</td>
+                    <td>2024-01-07</td>
+                    <td>2024-01-03</td>
+                    <td>2024-01-04</td>
+                    <td>2024-01-05</td>
+                    <td>2024-01-06</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <script src="js/script.js"></script>
+</body>
+</html>
