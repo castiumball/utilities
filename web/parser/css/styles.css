@@ -1,94 +1,594 @@
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-  }
+/* ============================================
+   PDF Parser - Stylesheet
+   ============================================
+   
+   Table of Contents:
+   1. Design Tokens (CSS Variables)
+   2. Reset & Base Styles
+   3. Utilities
+   4. Layout
+   5. Components
+      5.1 Header
+      5.2 Buttons
+      5.3 Form Elements
+      5.4 Drop Zone
+      5.5 Loading Indicator
+      5.6 PDF Viewer
+      5.7 Output Panel
+      5.8 JSON Display
+   
+   ============================================ */
+
+
+/* ============================================
+   1. Design Tokens
+   ============================================
+   Centralized design values for consistency.
+   Naming: --category-property-variant
+   ============================================ */
+
+:root {
+  /* Colors: Background hierarchy (darkest to lightest) */
+  --color-bg-deep: #0d1117;
+  --color-bg-primary: #161b22;
+  --color-bg-secondary: #21262d;
+  --color-bg-tertiary: #30363d;
   
-  body {
-    font-family: system-ui, -apple-system, sans-serif;
-    background: #1a1a2e;
-    color: #eee;
-    min-height: 100vh;
-  }
+  /* Colors: Text hierarchy (brightest to dimmest) */
+  --color-text-primary: #f0f6fc;
+  --color-text-secondary: #8b949e;
+  --color-text-muted: #484f58;
   
-  .header {
-    padding: 1rem 2rem;
-    background: #16213e;
-    border-bottom: 1px solid #0f3460;
-  }
+  /* Colors: Semantic */
+  --color-accent: #58a6ff;
+  --color-accent-glow: rgba(88, 166, 255, 0.3);
+  --color-success: #3fb950;
+  --color-error: #f85149;
+  --color-warning: #d29922;
   
-  .container {
-    display: flex;
-    height: calc(100vh - 60px);
-  }
+  /* Colors: Borders */
+  --color-border: #30363d;
   
-  .panel {
-    flex: 1;
-    padding: 1rem;
-    overflow-y: auto;
-  }
+  /* Spacing scale (based on 0.25rem = 4px) */
+  --space-xs: 0.25rem;   /* 4px */
+  --space-sm: 0.5rem;    /* 8px */
+  --space-md: 0.75rem;   /* 12px */
+  --space-lg: 1rem;      /* 16px */
+  --space-xl: 1.5rem;    /* 24px */
+  --space-2xl: 2rem;     /* 32px */
+  --space-3xl: 3rem;     /* 48px */
+  --space-4xl: 4rem;     /* 64px */
   
-  .panel-left {
-    border-right: 1px solid #0f3460;
-  }
+  /* Typography */
+  --font-family-base: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-family-mono: 'Cascadia Code', 'Fira Code', 'JetBrains Mono', monospace;
   
-  /* Drop Zone */
-  .drop-zone {
-    border: 2px dashed #0f3460;
-    border-radius: 8px;
-    padding: 3rem;
-    text-align: center;
-    transition: border-color 0.2s, background 0.2s;
-    cursor: pointer;
-  }
+  --font-size-xs: 0.75rem;    /* 12px */
+  --font-size-sm: 0.8125rem;  /* 13px */
+  --font-size-base: 0.875rem; /* 14px */
+  --font-size-lg: 1rem;       /* 16px */
+  --font-size-xl: 1.125rem;   /* 18px */
+  --font-size-2xl: 1.25rem;   /* 20px */
   
-  .drop-zone.drag-over {
-    border-color: #e94560;
-    background: rgba(233, 69, 96, 0.1);
-  }
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
   
-  .drop-zone.hidden {
-    display: none;
-  }
+  --line-height-tight: 1.25;
+  --line-height-base: 1.5;
+  --line-height-relaxed: 1.6;
   
-  /* PDF Viewer */
-  .pdf-viewer {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
+  /* Border radius */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-full: 9999px;
   
-  .pdf-viewer.hidden {
-    display: none;
-  }
+  /* Transitions */
+  --transition-fast: 0.15s ease;
+  --transition-base: 0.2s ease;
+  --transition-slow: 0.3s ease;
   
-  .pdf-pages {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
-  }
+  /* Shadows */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.4);
   
-  .pdf-pages canvas {
-    max-width: 100%;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-    border-radius: 4px;
-  }
+  /* Layout: Calculated from design (header height determines main area) */
+  --header-height: 53px;
   
-  /* Right panel placeholder */
-  .chunks-container {
-    background: #16213e;
-    border-radius: 8px;
-    padding: 1rem;
-    min-height: 200px;
+  /* Z-index scale */
+  --z-dropdown: 100;
+  --z-modal: 200;
+  --z-tooltip: 300;
+}
+
+
+/* ============================================
+   2. Reset & Base Styles
+   ============================================ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-base);
+  color: var(--color-text-primary);
+  background: var(--color-bg-deep);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+
+/* ============================================
+   3. Utilities
+   ============================================ */
+
+.hidden {
+  display: none !important;
+}
+
+/* Screen reader only - visually hidden but accessible */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+
+/* ============================================
+   4. Layout
+   ============================================ */
+
+.main-container {
+  display: flex;
+  height: calc(100vh - var(--header-height));
+}
+
+.panel {
+  flex: 1;
+  padding: var(--space-lg);
+  overflow-y: auto;
+}
+
+.panel--left {
+  background: var(--color-bg-deep);
+  border-right: 1px solid var(--color-border);
+}
+
+.panel--right {
+  background: var(--color-bg-primary);
+}
+
+
+/* ============================================
+   5.1 Header
+   ============================================ */
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-md) var(--space-xl);
+  background: var(--color-bg-primary);
+  border-bottom: 1px solid var(--color-border);
+  height: var(--header-height);
+}
+
+.header__title {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  letter-spacing: -0.02em;
+}
+
+.header__controls {
+  display: flex;
+  gap: var(--space-md);
+  align-items: center;
+}
+
+
+/* ============================================
+   5.2 Buttons
+   ============================================ */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-lg);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.btn--primary {
+  background: var(--color-accent);
+  color: var(--color-bg-deep);
+}
+
+.btn--primary:hover:not(:disabled) {
+  filter: brightness(1.1);
+  box-shadow: 0 0 12px var(--color-accent-glow);
+}
+
+.btn--primary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn--icon {
+  padding: var(--space-xs) var(--space-sm);
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  font-size: var(--font-size-lg);
+}
+
+.btn--icon:hover {
+  background: var(--color-bg-tertiary);
+  border-color: var(--color-accent);
+}
+
+/* Copy button success state */
+.btn--icon.copied {
+  background: var(--color-success);
+  border-color: var(--color-success);
+}
+
+.btn__icon {
+  font-size: var(--font-size-xs);
+}
+
+
+/* ============================================
+   5.3 Form Elements
+   ============================================ */
+
+.processor-select {
+  min-width: 180px;
+  padding: var(--space-sm) var(--space-2xl) var(--space-sm) var(--space-md);
+  font-size: var(--font-size-base);
+  color: var(--color-text-primary);
+  background-color: var(--color-bg-secondary);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238b949e' d='M2 4l4 4 4-4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right var(--space-md) center;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  appearance: none;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.processor-select:hover {
+  border-color: var(--color-accent);
+}
+
+.processor-select:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px var(--color-accent-glow);
+}
+
+
+/* ============================================
+   5.4 Drop Zone
+   ============================================ */
+
+.drop-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  /* Vertically center in available space */
+  margin-top: 15%;
+  padding: var(--space-4xl) var(--space-2xl);
+  text-align: center;
+  background: var(--color-bg-primary);
+  border: 2px dashed var(--color-border);
+  border-radius: var(--radius-xl);
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.drop-zone:hover,
+.drop-zone:focus {
+  border-color: var(--color-accent);
+  background: var(--color-bg-secondary);
+}
+
+.drop-zone:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--color-accent-glow);
+}
+
+/* Active drag state */
+.drop-zone.drag-over {
+  border-color: var(--color-accent);
+  background: rgba(88, 166, 255, 0.05);
+  box-shadow: inset 0 0 30px var(--color-accent-glow);
+}
+
+.drop-zone__icon {
+  font-size: var(--space-3xl);
+  margin-bottom: var(--space-lg);
+  opacity: 0.7;
+}
+
+.drop-zone__title {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-sm);
+}
+
+.drop-zone__subtitle {
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+}
+
+.drop-zone__input {
+  /* Hidden but accessible for programmatic click */
+  display: none;
+}
+
+
+/* ============================================
+   5.5 Loading Indicator
+   ============================================ */
+
+.loading-indicator {
+  text-align: center;
+  padding: var(--space-2xl);
+  margin-top: 20%;
+  animation: fadeIn var(--transition-slow);
+}
+
+.loading-indicator__text {
+  margin-bottom: var(--space-lg);
+  color: var(--color-text-secondary);
+}
+
+.progress {
+  width: 80%;
+  height: 6px;
+  margin: 0 auto var(--space-sm);
+  background: var(--color-bg-tertiary);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.progress__bar {
+  height: 100%;
+  width: 0%;
+  background: var(--color-accent);
+  box-shadow: 0 0 10px var(--color-accent-glow);
+  transition: width 0.1s ease;
+}
+
+.progress__text {
+  color: var(--color-text-secondary);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
   }
-  
-  .placeholder {
-    color: #666;
-    text-align: center;
-    padding: 2rem;
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
-  
-  .hidden {
-    display: none;
+}
+
+
+/* ============================================
+   5.6 PDF Viewer
+   ============================================ */
+
+.pdf-viewer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.pdf-viewer__pages {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-lg);
+}
+
+.pdf-viewer__pages canvas {
+  max-width: 100%;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-md);
+}
+
+
+/* ============================================
+   5.7 Output Panel
+   ============================================ */
+
+.output-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-lg);
+  padding-bottom: var(--space-md);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.output-header__title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.output-header__controls {
+  display: flex;
+  gap: var(--space-md);
+  align-items: center;
+}
+
+/* Badge component for page indicator */
+.badge {
+  padding: var(--space-xs) var(--space-md);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-accent);
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  transition: all var(--transition-slow);
+}
+
+.output-container {
+  min-height: calc(100vh - 160px);
+  background: var(--color-bg-secondary);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+/* Output states: placeholder, loading, error */
+.output-state {
+  text-align: center;
+  padding: var(--space-4xl) var(--space-2xl);
+}
+
+.output-state--placeholder {
+  color: var(--color-text-muted);
+}
+
+.output-state--placeholder strong {
+  color: var(--color-accent);
+}
+
+.output-state--loading {
+  color: var(--color-text-secondary);
+}
+
+.output-state--error {
+  color: var(--color-error);
+}
+
+.output-state__icon {
+  display: block;
+  font-size: var(--space-3xl);
+  margin-bottom: var(--space-lg);
+  opacity: 0.5;
+}
+
+.output-state--error .output-state__icon {
+  opacity: 1;
+}
+
+.output-state p {
+  line-height: var(--line-height-relaxed);
+}
+
+/* Spinner animation */
+.spinner {
+  width: 40px;
+  height: 40px;
+  margin: 0 auto var(--space-lg);
+  border: 3px solid var(--color-bg-tertiary);
+  border-top-color: var(--color-accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
   }
+}
+
+
+/* ============================================
+   5.8 JSON Display
+   ============================================ */
+
+.output-json {
+  margin: 0;
+  padding: var(--space-lg);
+  max-height: calc(100vh - 160px);
+  overflow: auto;
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-relaxed);
+  background: var(--color-bg-secondary);
+}
+
+.output-json code {
+  display: block;
+  white-space: pre;
+}
+
+/* JSON syntax highlighting tokens */
+.json-key {
+  color: #79c0ff;
+}
+
+.json-string {
+  color: #a5d6ff;
+}
+
+.json-number {
+  color: #56d364;
+}
+
+.json-boolean {
+  color: #ff7b72;
+}
+
+.json-null {
+  color: var(--color-text-secondary);
+}
+
+
+/* ============================================
+   Scrollbar Styling
+   ============================================ */
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg-deep);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-bg-tertiary);
+  border-radius: var(--radius-sm);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-muted);
+}
