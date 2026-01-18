@@ -3,40 +3,136 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PDF Ingestion</title>
+  <meta name="description" content="PDF Parser - Upload and parse PDF documents using configurable processors">
+  <title>PDF Parser</title>
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-  <header class="header">
-    <h1>PDF Ingestion</h1>
+  <!-- ============================================
+       Header: App title and parser controls
+       ============================================ -->
+  <header class="header" role="banner">
+    <h1 class="header__title">PDF Parser</h1>
+    
+    <div class="header__controls">
+      <label for="processor-select" class="visually-hidden">Select Parser</label>
+      <select 
+        id="processor-select" 
+        class="processor-select"
+        aria-label="Select a parser to process the PDF"
+      >
+        <option value="">Loading processors...</option>
+      </select>
+      
+      <button 
+        id="parse-btn" 
+        class="btn btn--primary" 
+        disabled
+        aria-label="Parse the uploaded PDF with selected processor"
+      >
+        <span class="btn__icon" aria-hidden="true">▶</span>
+        <span class="btn__text">Parse PDF</span>
+      </button>
+    </div>
   </header>
   
-  <main class="container">
-    <!-- Left Panel: PDF Viewer -->
-    <section class="panel panel-left">
-      <div id="drop-zone" class="drop-zone">
-        <p>Drag & drop PDF here</p>
-        <p>or</p>
-        <input type="file" id="file-input" accept=".pdf" />
+  <!-- ============================================
+       Main Content: Two-panel layout
+       ============================================ -->
+  <main class="main-container" role="main">
+    
+    <!-- ==========================================
+         Left Panel: PDF Upload & Viewer
+         ========================================== -->
+    <section class="panel panel--left" aria-label="PDF Viewer">
+      
+      <!-- Drop Zone: Initial upload state -->
+      <div 
+        id="drop-zone" 
+        class="drop-zone"
+        role="button"
+        tabindex="0"
+        aria-label="Drop PDF file here or click to browse"
+      >
+        <span class="drop-zone__icon" aria-hidden="true">📄</span>
+        <p class="drop-zone__title">Drag & drop PDF here</p>
+        <p class="drop-zone__subtitle">or click to browse</p>
+        <input 
+          type="file" 
+          id="file-input" 
+          class="drop-zone__input"
+          accept=".pdf"
+          aria-hidden="true"
+        />
+      </div>
+
+      <!-- Loading State: PDF rendering progress -->
+      <div id="loading-indicator" class="loading-indicator hidden" aria-live="polite">
+        <p class="loading-indicator__text">Processing PDF...</p>
+        <div class="progress" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+          <div id="progress-bar" class="progress__bar"></div>
+        </div>
+        <p id="progress-text" class="progress__text">0%</p>
       </div>
       
+      <!-- PDF Viewer: Rendered pages -->
       <div id="pdf-viewer" class="pdf-viewer hidden">
-        <div id="pdf-pages" class="pdf-pages">
-          <!-- Canvas elements rendered here -->
+        <div id="pdf-pages" class="pdf-viewer__pages">
+          <!-- Canvas elements for each page rendered dynamically -->
         </div>
       </div>
     </section>
     
-    <!-- Right Panel: JSON Chunks -->
-    <section class="panel panel-right">
-      <h2>Extracted Chunks</h2>
-      <div id="chunks-container" class="chunks-container">
-        <p class="placeholder">Upload a PDF to see chunks</p>
+    <!-- ==========================================
+         Right Panel: Parser Output
+         ========================================== -->
+    <section class="panel panel--right" aria-label="Parser Output">
+      
+      <header class="output-header">
+        <h2 class="output-header__title">Parser Output</h2>
+        <div class="output-header__controls">
+          <div id="page-indicator" class="badge hidden" aria-live="polite">
+            Page <span id="current-page-num">--</span>
+          </div>
+          <button 
+            id="copy-btn" 
+            class="btn btn--icon hidden" 
+            title="Copy JSON to clipboard"
+            aria-label="Copy JSON output to clipboard"
+          >
+            <span aria-hidden="true">📋</span>
+          </button>
+        </div>
+      </header>
+      
+      <div id="output-container" class="output-container">
+        
+        <!-- Placeholder: Initial empty state -->
+        <div id="output-placeholder" class="output-state output-state--placeholder">
+          <span class="output-state__icon" aria-hidden="true">📋</span>
+          <p>Upload a PDF and click <strong>Parse PDF</strong> to see results</p>
+        </div>
+        
+        <!-- Loading: Parse in progress -->
+        <div id="output-loading" class="output-state output-state--loading hidden" aria-live="polite">
+          <div class="spinner" aria-hidden="true"></div>
+          <p>Running parser...</p>
+        </div>
+        
+        <!-- Error: Parse failed -->
+        <div id="output-error" class="output-state output-state--error hidden" role="alert">
+          <span class="output-state__icon" aria-hidden="true">⚠️</span>
+          <p id="error-message"></p>
+        </div>
+        
+        <!-- Result: JSON output with syntax highlighting -->
+        <pre id="output-json" class="output-json hidden"><code id="json-content"></code></pre>
       </div>
     </section>
   </main>
 
-  <script src="lib/pdf.min.js"></script>
-  <script src="js/main.js" type="module"></script>
+  <!-- Scripts loaded as modules for better dependency management -->
+  <script type="module" src="lib/pdf.mjs"></script>
+  <script type="module" src="js/main.js"></script>
 </body>
 </html>
