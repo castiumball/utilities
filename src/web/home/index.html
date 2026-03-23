@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Polaris</title>
+    <link rel="stylesheet" href="./home/css/styles.css">
+</head>
+<body>
+    <canvas id="starfield" aria-hidden="true"></canvas>
+
+    <div class="overlay">
+        <div class="content">
+            <h1 class="title">Polaris</h1>
+            <p class="badge">VERSION 1.0</p>
+            <p class="tagline">Search and understand STARS manuals instantly</p>
+            <a href="./chat" class="cta-button" onclick="event.preventDefault(); var p=window.location.pathname; if(p.charAt(p.length-1)!=='/') p+='/'; window.location.href=p+'chat/';">Begin</a>
+        </div>
+    </div>
+
+    <script src="./home/js/starfield.js"></script>
+</body>
+</html>

@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Ingestion - Upload and process PDF documents through the ingestion pipeline">
+  <title>Ingestion</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <!-- ============================================
+       Header: App title
+       ============================================ -->
+  <header class="header" role="banner">
+    <h1 class="header__title">Ingestion</h1>
+  </header>
+
+  <!-- ============================================
+       Main Content: Multi-panel layout
+       ============================================ -->
+  <main class="main-container" role="main">
+    <!-- ==========================================
+         Left Sidebar: Document Library
+         ========================================== -->
+    <aside id="document-sidebar" class="document-sidebar" aria-label="Document Library">
+      <header class="document-sidebar__header">
+        <h2 class="document-sidebar__title">Documents</h2>
+        <button id="sidebar-toggle" class="btn btn--pill" aria-label="Toggle document sidebar">
+          <span aria-hidden="true">☰</span>
+        </button>
+      </header>
+      <button
+        id="upload-document-button"
+        class="btn btn--pill document-sidebar__upload"
+        type="button"
+      >
+        Upload document
+      </button>
+      <div class="document-sidebar__search">
+        <input
+          id="document-search"
+          class="document-search__input"
+          type="search"
+          placeholder="Search documents..."
+          aria-label="Search uploaded documents"
+        />
+      </div>
+      <div class="document-sidebar__section">
+        <div class="document-sidebar__section-title">Pinned</div>
+        <ul id="pinned-documents" class="document-list"></ul>
+      </div>
+      <div class="document-sidebar__section">
+        <div class="document-sidebar__section-title">All Documents</div>
+        <ul id="all-documents" class="document-list"></ul>
+      </div>
+    </aside>
+
+    <!-- ==========================================
+         Left Panel: PDF Upload & Viewer
+         ========================================== -->
+    <section class="panel panel--left" aria-label="PDF Viewer">
+      <div class="panel-toolbar" aria-label="Parser controls">
+        <div class="panel-toolbar__group">
+          <label for="parser-select" class="panel-toolbar__label">Parser</label>
+          <select
+            id="parser-select"
+            class="parser-select"
+            aria-label="Select a parser to process the PDF"
+          >
+            <option value="">Loading parsers...</option>
+          </select>
+          <button
+            id="markdown-toggle"
+            class="btn btn--pill"
+            type="button"
+            aria-pressed="false"
+            aria-controls="markdown-panel"
+          >
+            Show Markdown
+          </button>
+        </div>
+        <div id="drop-zone-meta" class="drop-zone__meta panel-toolbar__meta hidden" aria-live="polite">
+          <div class="drop-zone__file">
+            <span id="drop-zone-file-name" class="drop-zone__file-name">—</span>
+            <span id="drop-zone-file-size" class="drop-zone__file-size">—</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Drop Zone: Initial upload state -->
+      <div
+        id="drop-zone"
+        class="drop-zone"
+        role="button"
+        tabindex="0"
+        aria-label="Drop PDF file here or click to browse"
+      >
+        <p class="drop-zone__title">Drag and drop</p>
+        <input
+          type="file"
+          id="file-input"
+          class="drop-zone__input"
+          accept=".pdf"
+          aria-hidden="true"
+        />
+      </div>
+
+      <!-- Loading State: PDF rendering progress -->
+      <div id="loading-indicator" class="loading-indicator hidden" aria-live="polite">
+        <p class="loading-indicator__text">Processing PDF...</p>
+        <div class="progress" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+          <div id="progress-bar" class="progress__bar"></div>
+        </div>
+        <p id="progress-text" class="progress__text">0%</p>
+      </div>
+
+      <!-- PDF Viewer: Rendered pages -->
+      <div id="pdf-viewer" class="pdf-viewer hidden">
+        <div id="pdf-pages" class="pdf-viewer__pages">
+          <!-- Canvas elements for each page rendered dynamically -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         Middle Panel: Markdown View
+         ========================================== -->
+    <section id="markdown-panel" class="panel panel--middle hidden" aria-label="Markdown View">
+      <header class="panel-header">
+        <h2 class="panel-header__title">Markdown</h2>
+      </header>
+      <div class="markdown-container">
+        <pre id="markdown-content" class="markdown-content"></pre>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         Right Panel: Output & Pipeline
+         ========================================== -->
+    <section class="panel panel--right" aria-label="Output and Pipeline">
+
+      <header class="panel-header output-header">
+        <h2 class="panel-header__title">Output</h2>
+        <div class="output-header__controls">
+          <!-- Parse-tab-only buttons -->
+          <button
+            id="pause-parse-btn"
+            class="btn btn--pill hidden"
+            type="button"
+            aria-label="Pause auto-parse"
+            aria-pressed="false"
+          >
+            Pause
+          </button>
+          <div id="page-indicator" class="btn btn--pill hidden" aria-live="polite">
+            Page <span id="current-page-num">--</span>
+          </div>
+          <div id="flag-wrapper" class="flag-wrapper hidden">
+            <button
+              id="flag-btn"
+              class="btn btn--pill"
+              type="button"
+              aria-label="Flag this page as problematic"
+              aria-pressed="false"
+            >
+              Flag
+            </button>
+            <span id="flag-note" class="flag-note"></span>
+          </div>
+          <button
+            id="save-chunks-btn"
+            class="btn btn--pill hidden"
+            title="Save parsed chunks to disk"
+            aria-label="Save parsed chunks to disk"
+          >
+            <span>Save Chunks</span>
+          </button>
+          <button
+            id="copy-btn"
+            class="btn btn--pill hidden"
+            title="Copy JSON to clipboard"
+            aria-label="Copy JSON output to clipboard"
+          >
+            <span>Copy</span>
+          </button>
+          <!-- Pipeline-tab-only button -->
+          <button
+            id="run-all-btn"
+            class="btn btn--pill hidden"
+            type="button"
+            title="Run full pipeline"
+            aria-label="Run full graph pipeline"
+          >
+            Run All
+          </button>
+        </div>
+      </header>
+
+      <div id="flag-nav" class="flag-nav hidden">
+        <span class="flag-nav__label">Flagged</span>
+        <button id="flag-prev-btn" class="btn btn--pill" type="button">&larr;</button>
+        <select id="flag-select" class="flag-select"></select>
+        <button id="flag-next-btn" class="btn btn--pill" type="button">&rarr;</button>
+      </div>
+
+      <!-- Tab bar -->
+      <nav class="output-tabs" role="tablist" aria-label="Output view">
+        <button id="tab-parse" class="output-tabs__tab output-tabs__tab--active"
+          role="tab" aria-selected="true" aria-controls="tabpanel-parse" type="button">Parse</button>
+        <button id="tab-pipeline" class="output-tabs__tab"
+          role="tab" aria-selected="false" aria-controls="tabpanel-pipeline" type="button">Pipeline</button>
+      </nav>
+
+      <!-- Tab panel: Parse (existing content) -->
+      <div id="tabpanel-parse" class="output-tabpanel" role="tabpanel" aria-labelledby="tab-parse">
+        <div id="output-container" class="output-container">
+
+          <!-- Placeholder: Initial empty state -->
+          <div id="output-placeholder" class="output-state output-state--placeholder">
+          </div>
+
+          <!-- Loading: Parse in progress -->
+          <div id="output-loading" class="output-state output-state--loading hidden" aria-live="polite">
+            <div class="spinner" aria-hidden="true"></div>
+            <p>Running parser...</p>
+          </div>
+
+          <!-- Error: Parse failed -->
+          <div id="output-error" class="output-state output-state--error hidden" role="alert">
+            <p id="error-message"></p>
+          </div>
+
+          <!-- Result: JSON output with syntax highlighting -->
+          <pre id="output-json" class="output-json hidden"><code id="json-content"></code></pre>
+        </div>
+      </div>
+
+      <!-- Tab panel: Pipeline -->
+      <div id="tabpanel-pipeline" class="output-tabpanel hidden" role="tabpanel" aria-labelledby="tab-pipeline">
+
+        <!-- Pipeline step list -->
+        <div class="pipeline-steps" aria-label="Pipeline progress">
+          <div class="pipeline-step" data-step="uploaded">
+            <div class="pipeline-step__indicator" data-status="pending"></div>
+            <div class="pipeline-step__info">
+              <div class="pipeline-step__name">Uploaded</div>
+              <div class="pipeline-step__detail"></div>
+            </div>
+          </div>
+          <div class="pipeline-step" data-step="preprocessed">
+            <div class="pipeline-step__indicator" data-status="pending"></div>
+            <div class="pipeline-step__info">
+              <div class="pipeline-step__name">Preprocessed</div>
+              <div class="pipeline-step__detail"></div>
+            </div>
+          </div>
+          <div class="pipeline-step" data-step="parsed">
+            <div class="pipeline-step__indicator" data-status="pending"></div>
+            <div class="pipeline-step__info">
+              <div class="pipeline-step__name">Parsed</div>
+              <div class="pipeline-step__detail"></div>
+            </div>
+          </div>
+          <div class="pipeline-step" data-step="entity_extracted">
+            <div class="pipeline-step__indicator" data-status="pending"></div>
+            <div class="pipeline-step__info">
+              <div class="pipeline-step__name">Entity Extraction</div>
+              <div class="pipeline-step__detail"></div>
+            </div>
+            <button class="btn btn--pill pipeline-step__run hidden"
+              data-action="extract" type="button">Run</button>
+          </div>
+          <div class="pipeline-step" data-step="graph_staged">
+            <div class="pipeline-step__indicator" data-status="pending"></div>
+            <div class="pipeline-step__info">
+              <div class="pipeline-step__name">Graph Staging</div>
+              <div class="pipeline-step__detail"></div>
+            </div>
+          </div>
+          <div class="pipeline-step" data-step="graph_ready">
+            <div class="pipeline-step__indicator" data-status="pending"></div>
+            <div class="pipeline-step__info">
+              <div class="pipeline-step__name">Graph Ingestion</div>
+              <div class="pipeline-step__detail"></div>
+            </div>
+            <button class="btn btn--pill pipeline-step__run hidden"
+              data-action="ingest" type="button">Run</button>
+          </div>
+        </div>
+
+        <!-- Step output display -->
+        <div id="pipeline-output" class="pipeline-output hidden">
+          <div class="pipeline-output__header">
+            <span class="pipeline-output__title">Result</span>
+            <button id="pipeline-output-toggle" class="btn btn--pill pipeline-output__toggle" type="button">
+              Show JSON
+            </button>
+          </div>
+          <div id="pipeline-output-summary" class="pipeline-output__summary">
+          </div>
+          <pre id="pipeline-output-json" class="output-json hidden"><code id="pipeline-json-content"></code></pre>
+        </div>
+
+        <!-- Pipeline error display -->
+        <div id="pipeline-error" class="pipeline-error hidden" role="alert">
+          <div class="pipeline-error__title">Error</div>
+          <p id="pipeline-error-message" class="pipeline-error__message"></p>
+        </div>
+
+        <!-- Delete graph action -->
+        <div id="pipeline-actions" class="pipeline-actions hidden">
+          <button id="delete-graph-btn" class="btn btn--pill pipeline-actions__delete" type="button">
+            Delete Graph
+          </button>
+        </div>
+
+        <!-- Progress control -->
+        <div id="progress-control" class="progress-control hidden">
+          <div class="progress-control__header">Chat Display Progress</div>
+          <div class="progress-control__row">
+            <input
+              id="progress-input"
+              class="progress-control__input"
+              type="number"
+              min="0"
+              max="100"
+              value="0"
+              aria-label="Ingestion progress percentage"
+            />
+            <span class="progress-control__percent">%</span>
+            <button id="progress-set-btn" class="btn btn--pill" type="button">Set</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Scripts loaded as modules for better dependency management -->
+  <script type="module" src="lib/pdf.mjs"></script>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

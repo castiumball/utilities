@@ -1,0 +1,146 @@
+/* ==========================================
+   Polaris Home Page
+   ========================================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+    overflow: hidden;
+    background: #05080f;
+    font-family: "Century Gothic", Futura, "Trebuchet MS", "Segoe UI", sans-serif;
+    color: #e8edf3;
+}
+
+/* Starfield canvas — fills entire viewport */
+#starfield {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+}
+
+/* Text overlay — single centered block, nudged slightly up */
+.overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-bottom: 8vh;
+    pointer-events: none;
+}
+
+.content {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
+    pointer-events: auto;
+    position: relative;
+}
+
+/* ==========================================
+   Text backdrop — soft vignette behind content
+   ========================================== */
+
+.content::before {
+    content: "";
+    position: absolute;
+    top: -6rem;
+    left: -16rem;
+    right: -16rem;
+    bottom: -5rem;
+    background: radial-gradient(
+        ellipse at center,
+        rgba(7, 13, 24, 0.75) 0%,
+        rgba(7, 13, 24, 0.35) 35%,
+        rgba(7, 13, 24, 0.1) 55%,
+        rgba(7, 13, 24, 0) 75%
+    );
+    z-index: -1;
+    pointer-events: none;
+}
+
+/* ==========================================
+   Title — large glowing "Polaris"
+   ========================================== */
+
+.title {
+    font-size: clamp(4.5rem, 10vw, 16rem);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: #e8f0ff;
+    text-shadow:
+        0 0 30px rgba(200, 220, 255, 0.6),
+        0 0 60px rgba(160, 195, 255, 0.35),
+        0 0 100px rgba(130, 170, 255, 0.15),
+        0 0 160px rgba(100, 150, 255, 0.08);
+    line-height: 1;
+    margin-bottom: 4rem;
+    user-select: none;
+}
+
+/* ==========================================
+   Subtitle / Badge
+   ========================================== */
+
+.badge {
+    font-size: clamp(0.8rem, 0.9vw, 1.1rem);
+    letter-spacing: 0.35em;
+    color: #D4A056;
+    font-weight: 600;
+}
+
+.tagline {
+    font-size: clamp(1.1rem, 1.2vw, 1.5rem);
+    color: #b0bdd0;
+    font-weight: 400;
+}
+
+/* ==========================================
+   CTA Button — solid gold, high prominence
+   ========================================== */
+
+.cta-button {
+    display: inline-block;
+    margin-top: 1.5rem;
+    padding: 0.8rem 2.8rem;
+    font-size: clamp(1rem, 1.1vw, 1.3rem);
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    color: #0a0e18;
+    text-decoration: none;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #D4A056, #DEB77F);
+    transition: all 0.3s ease;
+    box-shadow:
+        0 0 20px rgba(212, 160, 86, 0.3),
+        0 0 40px rgba(212, 160, 86, 0.1);
+    cursor: pointer;
+}
+
+.cta-button:hover {
+    background: linear-gradient(135deg, #DEB77F, #e8c894);
+    box-shadow:
+        0 0 25px rgba(212, 160, 86, 0.45),
+        0 0 50px rgba(212, 160, 86, 0.15);
+    transform: translateY(-1px);
+}
+
+.cta-button:active {
+    transform: translateY(0) scale(0.98);
+}
+
+.cta-button:focus-visible {
+    outline: 2px solid #DEB77F;
+    outline-offset: 3px;
+}

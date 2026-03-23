@@ -1,0 +1,18 @@
+# Large binaries
+*.zip
+wheels/
+nvidia-toolkit-rpms/
+models/
+
+# Sensitive / local
+DONT_COPY/
+.claude/settings.local.json
+nul
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+*.egg-info/

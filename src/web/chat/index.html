@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Polaris</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="css/styles.css">
+        <link rel="stylesheet" href="css/github-dark.min.css">
+    </head>
+    <body>
+        <div class="app-layout">
+            <!-- Sidebar -->
+            <aside class="sidebar" id="sidebar">
+                <div class="sidebar-header">
+                    <button class="sidebar-toggle" id="sidebar-close" aria-label="Close sidebar">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <path d="M4 5H16M4 10H16M4 15H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </button>
+                    <button class="new-chat-btn" id="new-chat-btn">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <path d="M9.5 2.5L13.5 6.5M11 1L15 5L5.5 14.5H1.5V10.5L11 1Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        New Chat
+                    </button>
+                </div>
+                <div class="sidebar-divider"></div>
+                <div class="sidebar-section-label">Chat History</div>
+                <div class="conversation-list" id="conversation-list">
+                    <!-- Populated by JS -->
+                </div>
+                <div class="sidebar-footer">
+                    <span class="sidebar-brand">POLARIS</span>
+                </div>
+            </aside>
+
+            <!-- Overlay for mobile -->
+            <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+            <!-- Main chat area -->
+            <main class="chat-main">
+                <div class="chat-header">
+                    <button class="sidebar-toggle" id="sidebar-open" aria-label="Open sidebar">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <path d="M4 5H16M4 10H16M4 15H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </button>
+                    <button class="sidebar-toggle" id="doc-panel-toggle" aria-label="Knowledge base">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <path d="M4 2H14L17 5V17C17 17.5523 16.5523 18 16 18H4C3.44772 18 3 17.5523 3 17V3C3 2.44772 3.44772 2 4 2Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M7 10H13M7 13H11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="chat-area">
+                    <div id="messages" class="messages"></div>
+                    <div class="input-area">
+                        <div class="input-box">
+                            <div class="textarea-wrapper">
+                                <div id="input-mirror" class="input-mirror input-text" aria-hidden="true"></div>
+                                <textarea id="input" class="input-text" placeholder="Type your question here" autocomplete="off" rows="1" maxlength="1000"></textarea>
+                                <div class="custom-scrollbar-track">
+                                    <div class="custom-scrollbar-thumb"></div>
+                                </div>
+                            </div>
+                            <div id="undo-tip" class="undo-tip">Tip: Undo may clear all text in Firefox. Use Ctrl+Shift+Z to redo. For better undo support, try Chrome or Edge.</div>
+                            <div class="input-footer">
+                                <div class="footer-left">
+                                    <span id="char-count" class="char-count">0 / 1000</span>
+                                    <span id="limit-error" class="limit-error">Max characters exceeded</span>
+                                </div>
+                                <button id="send-btn" class="send-btn" aria-label="Send message" disabled>
+                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                    <path d="M10 16V4M10 4L5 9M10 4L15 9" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+            <!-- Document knowledge drawer -->
+            <div class="doc-panel-overlay" id="doc-panel-overlay"></div>
+            <aside class="doc-panel" id="doc-panel">
+                <div class="doc-panel-header">
+                    <span class="doc-panel-title">Knowledge Base</span>
+                    <button class="sidebar-toggle" id="doc-panel-close" aria-label="Close knowledge base">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <path d="M5 5L15 15M15 5L5 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="sidebar-divider"></div>
+                <div class="doc-panel-list" id="doc-panel-list">
+                    <!-- Populated by JS -->
+                </div>
+            </aside>
+        </div>
+        <script src="js/marked.min.js"></script>
+        <script src="js/highlight.min.js"></script>
+        <script src="js/script.js"></script>
+    </body>
+</html>

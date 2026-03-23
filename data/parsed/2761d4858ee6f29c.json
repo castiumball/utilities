@@ -1,0 +1,673 @@
+{
+  "metadata": {
+    "title": "CSCI-1 SDD",
+    "doc_number": null,
+    "pages_processed": null
+  },
+  "chunks": [
+    {
+      "type": "section",
+      "number": "1000",
+      "title": "Technology Drive, Suite 3310",
+      "content": "**Fairmont, West Virginia 26554**\n\n**Telephone: (304) 368-4120**\n\n**Fax: (304) 366-8096**\n\n**Dr. Lars Ericson, Director**\n\n**Steve Shine (Azimuth, Inc.)**\n\n**UNCLASSIFIED**\n\n**This project was supported by Award No. 2010-IJ-CX-K024 and 2014-ZD-CX-K001, awarded by** **the National Institute of Justice, Office of Justice Programs, U.S. Department of Justice. The** **opinions, findings, and conclusions or recommendations expressed in this publication are those of** **the author(s) and do not necessarily reflect those of the Department of Justice.**\n\nThis document is a research report submitted to the U.S. Department of Justice. This report has not been published by the Department. Opinions or points of view expressed are those of the author(s) and do not necessarily reflect the official position or policies of the U.S. Department of Justice.\n\n--\n\n**Minutia Deviation Tool: SDD (v. 2.0)**\n\n**NIJ SSBT CoE**\n\n**TABLE OF CONTENTS**\n\nLIST OF FIGURES ....................................................................................................................... iv\n\nLIST OF TABLES ...........................................................................................................................v\n\nCHANGE HISTORY..................................................................................................................... vi\n\n1.0 SCOPE .......................................................................................................................................1\n\n1.1 Identification ..................................................................................................................1\n\n1.2 System Overview ...........................................................................................................1 1.3 Document Overview ......................................................................................................1\n\n2.0 REFERENCED DOCUMENTS ................................................................................................2\n\n3.0 CSCI-WIDE DESIGN DECISIONS .........................................................................................3\n\n3.1 Capability: Display Fingerprint Images and Minutiae ...................................................3\n\n3.1.1 New Session ....................................................................................................4 3.1.2 Open Session ...................................................................................................5 3.1.3 Image & Minutia Display ...............................................................................5\n\n3.1.3.1 Coordinate System ...........................................................................7 3.1.4 Adjust Center Point .........................................................................................8 3.1.5 Selecting Minutia ............................................................................................9 3.2 Capability: Calculate Minutiae Deviations ....................................................................9\n\n3.2.1 Cartesian Deviations .....................................................................................10\n\n3.2.2 Delta Angular Deviations .............................................................................10 3.3 Capability: Filter Minutia Deviations ..........................................................................11\n\n3.3.1 Filter with Cartesian Deviation Calculations ................................................11\n\n3.3.2 Filter Random Selections ..............................................................................12\n\n3.4 CSCI External Interface Design ...................................................................................13\n\n3.4.1 Interface Identification and Diagrams ..........................................................13 3.4.2 GUI ...............................................................................................................13\n\n3.4.3 EBTS Files ....................................................................................................14\n\n3.4.3.1 Opening EBTS Files ......................................................................14 3.4.3.2 Viewing EBTS Files ......................................................................15 3.4.3.3 MDT Use of EBTS Fields ..............................................................16\n\n3.4.3.4 Exporting EBTS Files ....................................................................16 3.4.4 Exporting Deviation Log File .......................................................................16 3.4.5 Exporting History File ..................................................................................17 3.4.6 Session File ...................................................................................................18 3.5 Security and Privacy Design ........................................................................................18 3.6 CSCI Environment Design ..........................................................................................18 3.7 Computer Resource Design .........................................................................................18\n\n3.7.1 Computer Hardware Design .........................................................................18 3.7.2 Computer Hardware Resource Utilization Design .......................................18 3.7.3 Computer Software Design ...........................................................................19 3.7.4 Computer Communications Design ..............................................................19 3.8 Software Quality Design ..............................................................................................19 3.9 Implementation Design ................................................................................................19\n\n3.9.1 Hardware Design ..........................................................................................19 3.9.2 Software Design ............................................................................................19\n\nUNCLASSIFIED\n\nii\n\nThis document is a research report submitted to the U.S. Department of Justice. This report has not been published by the Department. Opinions or points of view expressed are those of the author(s) and do not necessarily reflect the official position or policies of the U.S. Department of Justice.\n\n--\n\n**Minutia Deviation Tool: SDD (v. 2.0)**\n\n**NIJ SSBT CoE**\n\n3.10 Personnel-Related Design ..........................................................................................19 3.11 Training-Related Requirements .................................................................................19 3.12 Logistics-Related Requirements ................................................................................19 3.13 Other Requirements ...................................................................................................20 4.0 CSCI ARCHITECTURAL DESIGN .......................................................................................21\n\n5.0 CSCI DETAILED DESIGN ....................................................................................................22\n\n6.0 REQUIREMENTS TRACEABILITY .....................................................................................23 7.0 NOTES .....................................................................................................................................25\n\nUNCLASSIFIED\n\niii\n\nThis document is a research report submitted to the U.S. Department of Justice. This report has not been published by the Department. Opinions or points of view expressed are those of the author(s) and do not necessarily reflect the official position or policies of the U.S. Department of Justice.\n\n--\n\n**Minutia Deviation Tool: SDD (v. 2.0)**\n\n**NIJ SSBT CoE**\n\n**LIST OF FIGURES**\n\nFigure 1: MDT High Level Structure ............................................................................................. 3 Figure 2: MDT GUI ........................................................................................................................ 4 Figure 3: New Session Workflow ................................................................................................... 5 Figure 4: Open Session Workflow .................................................................................................. 5 Figure 5: Minutiae Graphical Representation ................................................................................. 7 Figure 6: Coordinate System .......................................................................................................... 8 Figure 7: Center Adjustment Window ............................................................................................ 9 Figure 8: Cartesian Deviation Filter Window ............................................................................... 12 Figure 9: MDT External Interface Diagram ................................................................................. 13 Figure 11: EBTS Viewer Window ................................................................................................ 15 Figure 12: History Window .......................................................................................................... 18\n\nUNCLASSIFIED\n\niv\n\nThis document is a research report submitted to the U.S. Department of Justice. This report has not been published by the Department. Opinions or points of view expressed are those of the author(s) and do not necessarily reflect the official position or policies of the U.S. Department of Justice.\n\n--\n\n**Minutia Deviation Tool: SDD (v. 2.0)**\n\n**NIJ SSBT CoE**\n\n**LIST OF TABLES**\n\nTable 2: Requirements Traceability Matrix .................................................................................. 23 Table 3: Acronyms and Abbreviations ......................................................................................... 25\n\nUNCLASSIFIED\n\nv\n\nThis document is a research report submitted to the U.S. Department of Justice. This report has not been published by the Department. Opinions or points of view expressed are those of the author(s) and do not necessarily reflect the official position or policies of the U.S. Department of Justice.\n\n--\n\n**Minutia Deviation Tool: SDD (v. 2.0)**\n\n**NIJ SSBT CoE**\n\n**CHANGE HISTORY**\n\n|Version/<br>Revision|Revision<br>Date|Description of Change| |---|---|---| |1.0|06/23/14<br>|Final Draft for Customer Review| |1.1<br>|07/21/14|Final Revised; Corrected typos| |2.0|03/17/15|Revised after alpha build to update for required approach and naming<br>convention|\n\nUNCLASSIFIED\n\nvi\n\nThis document is a research report submitted to the U.S. Department of Justice. This report has not been published by the Department. Opinions or points of view expressed are those of the author(s) and do not necessarily reflect the official position or policies of the U.S. Department of Justice.\n\n--\n\n**Minutia Deviation Tool: SDD (v. 2.0)**\n\n**NIJ SSBT CoE**",
+      "parent_section": null,
+      "page_start": 2,
+      "page_end": 7,
+      "image_path": null
+    },
+    {
+      "type": "section",
+      "number": "1.0",
+      "title": "SCOPE",
+      "content": "",
+      "parent_section": "1",
+      "page_start": 8,
+      "page_end": 8,
+      "image_path": null
+    },
+    {
+      "type": "section",
+      "number": "1.1",
+      "title": "Identification",
+      "content": "Minutia Deviation Tool (MDT), version 1.0 (beta)",
+      "parent_section": "1",
+      "page_start": 8,
+      "page_end": 8,
+      "image_path": null
+    },
+    {
+      "type": "section",
+      "number": "1.2",
+      "title": "System Overview",
+      "content": "The MDT is a prototype Computer Software Configuration Item (CSCI) (i.e., software utility) that shall aid a user in designating equivalent minutia pairs across two fingerprint biometric images and calculating the pair’s minutia spatial deviations. MDT shall serve as a tool to support research and analysis of contactless and contact-based fingerprint data.\n\nNo prior software development exists for the MDT.\n\nThe tool shall be used by biometrics researchers in academia, government, and industry, as designated and distributed by the sponsors, in an independent manner without operations or maintenance support from the developer. The MDT version being developed shall be in a Beta state, not suitable for general release, but possessing suitable stability for use by knowledgeable and experienced researchers.\n\nMDT development is part of the Contactless Fingerprint Research (Phase 2) project. The effort is sponsored by the Director, Defense Biometrics and Forensics in partnership with the National Institute of Justice (NIJ).\n\nThe MDT is being developed by ManTech Advanced Systems International, Inc. (and its subcontractor, Azimuth, Inc.) under the National Institute of Justice (NIJ) Sensor, Surveillance, and Biometric Technologies (SSBT) Center of Excellence (CoE) cooperative agreement (Award# 2010-IJ-CX-K024 and 2014-ZD-CX-K001). The NIJ SSBT CoE is a center within the National Law Enforcement and Corrections Technology Center (NLECTC) System. The Center provides scientific and technical support to NIJ’s R&D efforts. The Center also provides technology assistance, information, and support to criminal justice agencies. The Center supports the sensor and surveillance portfolio and biometrics portfolio. The CoEs are the authoritative resource within the NLECTC System for both practitioners and developers in their technology area(s) of focus. The primary role of the CoEs is to assist in the transition of law enforcement technology from the laboratory into practice by first adopters.",
+      "parent_section": "1",
+      "page_start": 8,
+      "page_end": 8,
+      "image_path": null
+    },
+    {
+      "type": "section",
+      "number": "1.3",
+      "title": "Document Overview",
+      "content": "The Software Design Description (SDD) document describes the design of the MDT, to include system-wide design decisions, architectural design, and approach for implementing the Computer Software Configuration Item (CSCI) capabilities specified in the Software Requirements Specification (SRS) document.\n\nUNCLASSIFIED\n\nThis document is a research report submitted to the U.S. Department of Justice. This report has not been published by the Department. Opinions or points of view expressed are those of the author(s) and do not necessarily reflect the official position or policies of the U.S. Department of Justice.\n\n--\n\n**Minutia Deviation Tool: SDD (v. 2.0)**\n\n**NIJ SSBT CoE**",
+      "parent_section": "1",
+      "page_start": 8,
+      "page_end": 9,
+      "image_path": null
+    },
+    {
+      "type": "section",
+      "number": "2.0",
+      "title": "REFERENCED DOCUMENTS",
+      "content": "- Department of Defense (DOD), _DI-IPSC-81435A Software Design Description Data Item_ _Description (SDD DID)_ (December 15, 1999).\n\n- National Institute of Standards and Technology (NIST), _ANSI/NIST-ITL 1-2011 Data_ _Format for the Interchange of Fingerprint, Facial & Other Biometric Information_ (January 2012).\n\n- Federal Bureau of Investigation (FBI), _IAFIS-DOC-01078-9.3 Electronic Biometric_ _Transmission Specification (EBTS) Version 9.3_ (December 9, 2011).\n\n- ManTech Advanced Systems International (MASI), _Contactless Fingerprint Research_ _(Phase 2) Program Narrative – Draft V7_ (January 15, 2014).\n\n- MASI and Azimuth, Inc.; _Evaluation of Contact versus Contactless Fingerprint Data_ _(Final Report v2)_ (January 23, 2014).\n\n- MASI, _Minutia Deviation Tool: Software Requirements Specification_ _FINAL REVISED_ (June 12, 2014).\n\n- Neurotechnology, _MegaMatcher 4.5, VeriFinger 6.7, VeriLook 5.4, VeriEye 2.7, and_ _VeriSpeak 2.0 SDK Developer’s Guide_ (2014).\n\nUNCLASSIFIED\n\nThis document is a research report submitted to the U.S. Department of Justice. This report has not been published by the Department. Opinions or points of view expressed are those of the author(s) and do not necessarily reflect the official position or policies of the U.S. Department of Justice.\n\n--\n\n**Minutia Deviation Tool: SDD (v. 2.0)**\n\n**NIJ SSBT CoE**",
+      "parent_section": "2",
+      "page_start": 9,
+      "page_end": 10,
+      "image_path": null
+    },
+    {
+      "type": "section",
+      "number": "3.0",
+      "title": "CSCI-WIDE DESIGN DECISIONS",
+      "content": "The MDT possesses three primary capabilities – Display Fingerprint Images and Minutiae, Calculate Minutia Deviations, and Filter Minutia Deviations. The MDT is a windows application and as such supports the standard windows like interface. The basic high level structure of the application provides a Graphical User Interface (GUI), Fingerprint View Control, File Manager, Minutiae Conversion Library, Session Data Manager, and Logging.",
+      "parent_section": "3",
+      "page_start": 10,
+      "page_end": 10,
+      "image_path": null
+    },
+    {
+      "type": "figure",
+      "number": "1",
+      "title": "MDT High Level Structure",
+      "content": "",
+      "parent_section": "3.0",
+      "page_start": 10,
+      "page_end": 10,
+      "image_path": "figure_1.png"
+    },
+    {
+      "type": "section",
+      "number": "3.1",
+      "title": "Capability: Display Fingerprint Images and Minutiae",
+      "content": "The MDT allows a user to open a pair of Latent Friction Ridge Features Search (LFFS) Electronic Biometrics Transmission Specification (EBTS) files or two sets of Images and Text files to display fingerprint images and associated minutiae data contained within the files. The minutiae are overlaid on the associated fingerprint image. The user can select individual minutiae to display details about the minutia location, position, and classification. Figure 2 shows the primary GUI for MDT. As portions of the GUI are discussed, a numerical label will be included as “[#]” for reference back to portions of this figure.\n\nUNCLASSIFIED\n\nThis document is a research report submitted to the U.S. Department of Justice. This report has not been published by the Department. Opinions or points of view expressed are those of the author(s) and do not necessarily reflect the official position or policies of the U.S. Department of Justice.\n\n--\n\n**Minutia Deviation Tool: SDD (v. 2.0)**\n\n**NIJ SSBT CoE**",
+      "parent_section": "3",
+      "page_start": 10,
+      "page_end": 11,
+      "image_path": null
+    },
+    {
+      "type": "figure",
+      "number": "2",
+      "title": "MDT GUI",
+      "content": "",
+      "parent_section": "3.1",
+      "page_start": 11,
+      "page_end": 11,
+      "image_path": "figure_2.jpeg"
+    },
+    {
+      "type": "section",
+      "number": "3.1.1",
+      "title": "New Session",
+      "content": "To begin a new MDT session for display or minutia analysis, a user executes the MDT software and selects _File_  _New_  _New MDT Session_ from the menu [1]. The user is prompted in a new window to select the file type to be used as inputs – LFFS files or Image and Comma-Separated Value (CSV) text files. See Section 3.4.3 EBTS Files for descriptions of the LFFS, Image, and CSV files’ details.\n\n- LFFS Files:\n\n`o` The user is prompted to browse Windows Explorer to locate and select an LFFS file (extension *.lffs) to be used as the Baseline Fingerprint, followed by locating and selecting a second LFFS file as the Comparison Fingerprint. See Section 3.4.3 EBTS Files for a description of the LFFS file details.\n\n- Image/CSV Files:\n\n`o` The user is prompted to browse Windows Explorer to locate and select a bitmap (extension *.bmp) image file to be used as the Baseline Fingerprint image, followed by locating and selecting the CSV text file for the Baseline Fingerprint minutiae. The user is then similarly prompted to browse and locate the BMP and CSV files to be used for the Comparison Fingerprint.\n\nUNCLASSIFIED\n\nThis document is a research report submitted to the U.S. Department of Justice. This report has not been published by the Department. Opinions or points of view expressed are those of the author(s) and do not necessarily reflect the official position or policies of the U.S. Department of Justice.\n\n--\n\n**Minutia Deviation Tool: SDD (v. 2.0)**\n\n**NIJ SSBT CoE**",
+      "parent_section": "3.1",
+      "page_start": 11,
+      "page_end": 12,
+      "image_path": null
+    },
+    {
+      "type": "figure",
+      "number": "3",
+      "title": "New Session Workflow",
+      "content": "",
+      "parent_section": "3.1.1",
+      "page_start": 12,
+      "page_end": 12,
+      "image_path": "figure_3.png"
+    },
+    {
+      "type": "section",
+      "number": "3.1.2",
+      "title": "Open Session",
+      "content": "To open a previously saved MDT session, a user executes the MDT software and selects _File_  _Open Session_ from the menu [1]. The user is prompted in a new window to browse Windows Explorer to locate and select a MDT Session file (MDTS, extension *.mdts). See Section 3.4.6 Session File for a description of the MDTS file.\n\nOpen Session Load Session",
+      "parent_section": "3.1",
+      "page_start": 12,
+      "page_end": 12,
+      "image_path": null
+    },
+    {
+      "type": "figure",
+      "number": "4",
+      "title": "Open Session Workflow",
+      "content": "",
+      "parent_section": "3.1.2",
+      "page_start": 12,
+      "page_end": 12,
+      "image_path": "figure_4.png"
+    },
+    {
+      "type": "section",
+      "number": "3.1.3",
+      "title": "Image & Minutia Display",
+      "content": "Upon selecting the file(s), the MDT reads the contained fields for the baseline and comparison fingerprints and their minutiae and writes them to the MDT internal database. The MDT database is empty at the start of each instance of executing the software.\n\nUNCLASSIFIED\n\nThis document is a research report submitted to the U.S. Department of Justice. This report has not been published by the Department. Opinions or points of view expressed are those of the author(s) and do not necessarily reflect the official position or policies of the U.S. Department of Justice.\n\n--\n\n**Minutia Deviation Tool: SDD (v. 2.0)**\n\n**NIJ SSBT CoE**\n\nA fingerprint image and all minutiae for the _Baseline Fingerprint_ are displayed in a window on the left [2], with the _Comparison Fingerprint_ image and minutiae displayed on the right [3]. The LFFS, CSV, or MDTS file includes the minutiae positions and details for marking the images without the need for user input or intervention. The _History_ window reports the names of the file(s) opened and reports that the minutiae have been populated for both images [4].\n\nThe _History_ window can be seen by clicking on the lower left tab [4] of the main GUI. The _History_ logs all actions taken within the MDT session. Further details on the types of actions recorded in the _History_ are described in Section 3.4.5 Exporting History File.\n\nAll of the minutiae are represented by a geometric shape (i.e., circle or square) to designate the minutia type, a line(s) protruding out to designate feature direction, and a color to designate status within the current session. The shape and direction provide visual information to a user on the location, position, and type of a given minutia. The color provides a visual indicator to aid in processing, reading, and analyzing specific minutia within the larger set of marks. These minutia characteristics are defined as follows:\n\n- Shape\n\n`o` Circle = Ridge Ending `o` Square = Bifurcation `o` Bold Circle = Core\n\n- Line(s) = Feature Direction(s)\n\n- Color\n\n`o` Red = Has not been selected in the session\n\n`o` Blue = Current active selection\n\n`o` Green = Has been previously selected and mated to a minutia in the other image\n\nFigure 2 shows an example display of fingerprint images and minutiae for a session in progress\n\n[2] [3]. A minutia pair has already been selected and deviations calculated, as indicated by Green marks. Another pair of minutia is currently selected and shown as Blue. When the user is finished with this pair and selects a new minutia, these two will change color to either Green or Red, depending on whether the minutia has been mated in a minutia pair and recorded in the _Mated_ log [4].\n\nUNCLASSIFIED\n\nThis document is a research report submitted to the U.S. Department of Justice. This report has not been published by the Department. Opinions or points of view expressed are those of the author(s) and do not necessarily reflect the official position or policies of the U.S. Department of Justice.\n\n--\n\n**Minutia Deviation Tool: SDD (v. 2.0)**\n\n**NIJ SSBT CoE**",
+      "parent_section": "3.1",
+      "page_start": 12,
+      "page_end": 14,
+      "image_path": null
+    },
+    {
+      "type": "figure",
+      "number": "5",
+      "title": "Minutiae Graphical Representation",
+      "content": "",
+      "parent_section": "3.1.3",
+      "page_start": 14,
+      "page_end": 14,
+      "image_path": "figure_5.png"
+    },
+    {
+      "type": "section",
+      "number": "3.1.3.1",
+      "title": "Coordinate System",
+      "content": "MDT uses the standard image processing coordinate system for its fingerprint images and minutiae, as specified by the FBI EBTS specifications for the Extended Feature Set (EFS). The origin (0, 0) is located in the upper left of the image with column index increasing from left to right and row index increasing from top to bottom. X and Y coordinates are in 10 micron units, similar to the units used in an EFS Quick Search Profile format Type-9 EBTS record. The\n\nUNCLASSIFIED\n\nThis document is a research report submitted to the U.S. Department of Justice. This report has not been published by the Department. Opinions or points of view expressed are those of the author(s) and do not necessarily reflect the official position or policies of the U.S. Department of Justice.\n\n--\n\n**Minutia Deviation Tool: SDD (v. 2.0)**\n\n**NIJ SSBT CoE**\n\nangular direction of minutiae (i.e., θ) is positive counterclockwise from the reference horizontal to the right. X, Y, and θ are reported as whole numbers without any decimal digits.",
+      "parent_section": "3.1.3",
+      "page_start": 14,
+      "page_end": 15,
+      "image_path": null
+    },
+    {
+      "type": "figure",
+      "number": "6",
+      "title": "Coordinate System",
+      "content": "**Example fingerprint and minutia in the MDT coordinate system. The origin is in the upper left with the**\n**maximum values in the lower right. The minutia details are shown in green according to the adopted**\n**standard.**",
+      "parent_section": "3.1.3.1",
+      "page_start": 15,
+      "page_end": 15,
+      "image_path": "figure_6.jpeg"
+    },
+    {
+      "type": "section",
+      "number": "3.1.4",
+      "title": "Adjust Center Point",
+      "content": "The user may adjust the center point for the _Baseline Fingerprint_ or _Comparison Fingerprint_ coordinate system(s). The default center point is the center pixel of the imported image. This is done after a session has been initiated and both fingerprint images are displayed. The user selects _Adjust Center Point_ from the main menu [1] and then selects either _Adjust Baseline_ _Center_ or _Adjust Comparison Center_ . A pop-up widow appears displaying the current center point position and rotation in (X, Y, ϕ) with buttons for adjusting the value (see Figure 7). The coordinates are listed in pixel values rather than 10 micron units. In addition, a coordinate axis is overlaid on the image reflecting the current coordinate values. The user uses the mouse cursor to click on the buttons to adjust the coordinate value by single increments in the desired direction. In the case of ϕ, the rotation values range from 0 – 359 in the counterclockwise direction; negative values are not permitted. As the user adjusts the center point, the displayed center axis will shift in the selected direction(s). Once the center point is in the desired position and rotation, the user clicks the _Update Center_ button. At that point, the center point coordinate values displayed in the main GUI (in 10 micron units) will update with the new values.\n\nUNCLASSIFIED\n\nThis document is a research report submitted to the U.S. Department of Justice. This report has not been published by the Department. Opinions or points of view expressed are those of the author(s) and do not necessarily reflect the official position or policies of the U.S. Department of Justice.\n\n--\n\n**Minutia Deviation Tool: SDD (v. 2.0)**\n\n**NIJ SSBT CoE**",
+      "parent_section": "3.1",
+      "page_start": 15,
+      "page_end": 16,
+      "image_path": null
+    },
+    {
+      "type": "figure",
+      "number": "7",
+      "title": "Center Adjustment Window",
+      "content": "",
+      "parent_section": "3.1.4",
+      "page_start": 16,
+      "page_end": 16,
+      "image_path": "figure_7.jpeg"
+    },
+    {
+      "type": "section",
+      "number": "3.1.5",
+      "title": "Selecting Minutia",
+      "content": "The user may use the pointer to select an individual minutia in either the _Baseline Fingerprint_ or _Comparison Fingerprint_ to display information about that minutia. The user moves the pointer over the center of a minutia and clicks with the left mouse button. The center viewing area of the GUI includes regions for displaying minutia details for the two fingerprint images [5]. A minutia selected on the left will update the fields in the _Baseline Marker_ region, while a minutia selected on the right will update _Comparison Marker._ Upon clicking on a minutia, its color will change from Red or Green to Blue, to indicate that it is the active minutia. The minutia details reported in the center region include:\n\n- X coordinate\n\n- Y coordinate\n\n- Angle of minutia direction\n\n- Type of minutia\n\nThe minutia detail region also displays the selected center point coordinates for both fingerprint images.",
+      "parent_section": "3.1",
+      "page_start": 16,
+      "page_end": 16,
+      "image_path": null
+    },
+    {
+      "type": "section",
+      "number": "3.2",
+      "title": "Capability: Calculate Minutiae Deviations",
+      "content": "The MDT calculates the spatial deviations between a pair of minutiae selected on the _Baseline_ _Fingerprint_ and _Comparison Fingerprint._ The user selects two minutiae using the capability described in Section 3.1.5 Selecting Minutia. Upon selection, the spatial deviations are automatically displayed in the deviation region of the GUI in the bottom right [6]. The user then has the option to save the pairing to the _Mated_ log by clicking on the button labeled _Mate Marker_ _Pair._ If the minutia pair is saved, then the previously selected minutia will change color to Green and the marker details in the central GUI region [5] revert to empty. Either minutia can be unselected prior to being mated by clicking on them again with the mouse cursor. Another minutia in a given image can only be selected if the minutia pair has been mated or if the initial minutia is unselected first.\n\nThe MDT is designed and developed to accommodate deviation modules. The current build incorporates a _Cartesian Deviation Calculation_ module (see Section 3.2.1 Cartesian Deviations) and a _Random Selection_ module (see Section 3.3.2 Filter Random Selections). Future enhancements to MDT could incorporate other deviation schema, such as _Polar Deviation_ _Calculation_ .\n\nUNCLASSIFIED\n\nThis document is a research report submitted to the U.S. Department of Justice. This report has not been published by the Department. Opinions or points of view expressed are those of the author(s) and do not necessarily reflect the official position or policies of the U.S. Department of Justice.\n\n--\n\n**Minutia Deviation Tool: SDD (v. 2.0)**\n\n**NIJ SSBT CoE**",
+      "parent_section": "3",
+      "page_start": 16,
+      "page_end": 17,
+      "image_path": null
+    },
+    {
+      "type": "section",
+      "number": "3.2.1",
+      "title": "Cartesian Deviations",
+      "content": "The deviation calculation module included in this build of MDT utilizes the standard Cartesian\n\ncoordinate system to calculate relative and absolute deviations between minutia pair(s). The various points and coordinates used in deviation calculations are defined as follows:\n\n- Comparison Minutia = (X CM, Y CM, θ CM ) in Cartesian\n\n- Baseline Minutia = (X BM, Y BM, θ BM ) in Cartesian\n\n- Comparison Center Point = (X CC, Y CC, ϕ CC ) in Cartesian\n\n- Baseline Center Point = (X BC, Y BC, ϕ BC ) in Cartesian\n\n- Corrected Comparison Minutia = (X’ CM, Y’ CM, θ’ CM ) in Cartesian\n\n- Corrected Baseline Minutia = (X’ BM, Y’ BM, θ’ BM ) in Cartesian\n\nThe _Relative Marker Deviations_ shows the difference in spatial position and minutia direction of the X, Y, and θ values of the two selected minutiae without accounting for the center points:\n\nThe Corrected Baseline and Comparison Minutiae are marker coordinates adjusted for the position and rotation of their respective center point. Because the coordinate system possesses an increasing Y value going from top to bottom, the standard rotational transformation equations must be adjusted by replacing ϕ with –ϕ, which results in the following equations:\n\nThe _Absolute Marker Deviations_ shows the change in the radial vector from the respective fingerprint center position to the selected minutia. This includes the straight line Distance between the two corrected minutiae, _D_ . The resulting change in center position vector is defined\n\nas:\n\nCartesian:",
+      "parent_section": "3.2",
+      "page_start": 17,
+      "page_end": 17,
+      "image_path": null
+    },
+    {
+      "type": "section",
+      "number": "3.2.2",
+      "title": "Delta Angular Deviations",
+      "content": "The MDT does not support selecting Delta marks or calculating deviations involving Deltas.\n\nUNCLASSIFIED\n\nThis document is a research report submitted to the U.S. Department of Justice. This report has not been published by the Department. Opinions or points of view expressed are those of the author(s) and do not necessarily reflect the official position or policies of the U.S. Department of Justice.\n\n--\n\n**Minutia Deviation Tool: SDD (v. 2.0)**\n\n**NIJ SSBT CoE**",
+      "parent_section": "3.2",
+      "page_start": 17,
+      "page_end": 18,
+      "image_path": null
+    },
+    {
+      "type": "section",
+      "number": "3.3",
+      "title": "Capability: Filter Minutia Deviations",
+      "content": "The MDT allows a user to filter minutiae by inputting threshold values to one or more minutia characteristic parameters and then export the results. To filter minutiae, the user selects whether to filter the Deviation Log, Baseline LFFS EBTS file, or Comparison LFFS EBTS file (i.e., Filter Target). The user selects _Export_  _Filter_  _<Filter Target>_ from the main menu [1]. Upon doing so, a pop-up window is displayed with a drop-down menu of installed/available filter modules along with a button for reading a description of the selected filter module. With a given module selected (e.g., Cartesian Deviation Calculation), the lower portion of the window lists all of the possible filter criteria. The user makes selections by clicking on radio buttons or entering threshold values for some of the fields, based on their desired effect or preference. Once all filter parameters have been set, the user clicks on the _OK_ button at the bottom of the window. The MDT exports a file with markings satisfying those conditions.",
+      "parent_section": "3",
+      "page_start": 18,
+      "page_end": 18,
+      "image_path": null
+    },
+    {
+      "type": "section",
+      "number": "3.3.1",
+      "title": "Filter with Cartesian Deviation Calculations",
+      "content": "The MDT includes a default filter module that utilizes Cartesian coordinate deviation\n\ncalculations. The module allows the _Deviation Log_, _Baseline EBTS,_ or _Comparison EBTS_ to be filtered using Cartesian deviations and minutia position variables, as described in Section 3.2.1 Cartesian Deviations. The _Enable_ button must be selected to use that variable as a filter\n\nparameter. The filter parameters available to a user are described as follows (linked options are grouped together):\n\n- Filter Method:\n\n`o` Satisfy ALL Conditions – Minutiae must meet all enabled filter parameters. `o` Satisfy ANY Conditions – Minutiae must meet at least one enabled filter parameters.\n\n- Relative Filters:\n\n`o` Min. <deviation> / Max. <deviation> – Minutiae must possess a deviation above and/or below the entered values, where <deviation> can equal ΔX R, ΔY R, or Δθ R . `o` Use Magnitude – The absolute value of the deviation variable is used to determine whether the minutia pair satisfies the filter parameter.\n\n- Absolute Filters\n\n`o` Min. <deviation> / Max. <deviation> – Minutiae must possess a deviation above and/or below the entered value, where <deviation> can equal ΔX A, ΔY A, Δθ A, or D.\n\n`o` Use Magnitude – Same as Relative Filters above.\n\n- Position Band +/- from Marked Center\n\n`o` Min. <position> / Max. <position> – Baseline minutiae must possess an absolute value corrected position above and/or below the entered values, where <position> can equal X’ BM or Y’ BM . `o` From Baseline – As previous, but the Comparison minutiae must possess an absolute value corrected position above and/or below the entered values, where <position> can equal X’ CM or Y’ CM .\n\nUNCLASSIFIED\n\nThis document is a research report submitted to the U.S. Department of Justice. This report has not been published by the Department. Opinions or points of view expressed are those of the author(s) and do not necessarily reflect the official position or policies of the U.S. Department of Justice.\n\n--\n\n**Minutia Deviation Tool: SDD (v. 2.0)**\n\n**NIJ SSBT CoE**",
+      "parent_section": "3.3",
+      "page_start": 18,
+      "page_end": 19,
+      "image_path": null
+    },
+    {
+      "type": "figure",
+      "number": "8",
+      "title": "Cartesian Deviation Filter Window",
+      "content": "",
+      "parent_section": "3.3.1",
+      "page_start": 19,
+      "page_end": 19,
+      "image_path": "figure_8.png"
+    },
+    {
+      "type": "section",
+      "number": "3.3.2",
+      "title": "Filter Random Selections",
+      "content": "The MDT allows a user to filter a specified number of randomly selected minutia pairs and export the results as a set of filtered _Deviation Log_, _Baseline EBTS,_ and _Comparison EBTS_ files. The files cannot be exported with random minutia individually so as to maintain the same minutiae within each associated file. The user selects _Export_  _Filter_  _<Filter Target>_ from the main menu [1], where _<Filter Target>_ is any of the three files. In the resulting pop-up window, the user clicks the drop-down menu and selects _Random Selection._ Upon doing so, the window display updates to include a single field titled “Number of random minutiae to select.” The user enters a number in the field and clicks _OK._ The window then closes and the user is guided to save each of the three files.\n\nThe _Random Selection_ filter module randomly selects X mated minutiae pairs where X is a number entered by the user. All other minutia pairs and all minutiae that have not been mated are filtered out. If X is greater than the number of minutia pairs, then all minutia pairs are selected and only the non-mated minutiae are filtered.\n\nUNCLASSIFIED\n\nThis document is a research report submitted to the U.S. Department of Justice. This report has not been published by the Department. Opinions or points of view expressed are those of the author(s) and do not necessarily reflect the official position or policies of the U.S. Department of Justice.\n\n--\n\n**Minutia Deviation Tool: SDD (v. 2.0)**\n\n**NIJ SSBT CoE**",
+      "parent_section": "3.3",
+      "page_start": 19,
+      "page_end": 20,
+      "image_path": null
+    },
+    {
+      "type": "section",
+      "number": "3.4",
+      "title": "CSCI External Interface Design",
+      "content": "",
+      "parent_section": "3",
+      "page_start": 20,
+      "page_end": 20,
+      "image_path": null
+    },
+    {
+      "type": "section",
+      "number": "3.4.1",
+      "title": "Interface Identification and Diagrams",
+      "content": "a. The MDT provides a GUI. b. The MDT allows a user to manually open files from the local computer. c. The MDT allows a user to manually save a results file to the local computer.",
+      "parent_section": "3.4",
+      "page_start": 20,
+      "page_end": 20,
+      "image_path": null
+    },
+    {
+      "type": "figure",
+      "number": "9",
+      "title": "MDT External Interface Diagram",
+      "content": "",
+      "parent_section": "3.4.1",
+      "page_start": 20,
+      "page_end": 20,
+      "image_path": "figure_9.png"
+    },
+    {
+      "type": "section",
+      "number": "3.4.2",
+      "title": "GUI",
+      "content": "The MDT provides a GUI that includes the following features, regions, and characteristics (see Figure 10):\n\n1. _Menu Bar_ – Drop-down menus of commands for opening, viewing, saving, and filtering files.\n\n2. _Baseline Fingerprint_ – Fingerprint image, minutiae, and collection information from the baseline LFFS file.\n\n3. _Comparison Fingerprint_ – Same as _Baseline Fingerprint_ for the comparison LFFS file. 4. _Mated/History_\n\na. _Mated_ – Minutia pairs that have been selected and mated. b. _History –_ Actions taken during the current MDT session. 5. _Selected Points_ – Minutia and center point details for selected points from _Baseline_ _Fingerprint_ and _Comparison Fingerprint_ regions. 6. _Deviation Calculations_ – Deviations calculated from the selected minutiae.\n\nUNCLASSIFIED\n\nThis document is a research report submitted to the U.S. Department of Justice. This report has not been published by the Department. Opinions or points of view expressed are those of the author(s) and do not necessarily reflect the official position or policies of the U.S. Department of Justice.\n\n--\n\n**Minutia Deviation Tool: SDD (v. 2.0)**\n\n**NIJ SSBT CoE**",
+      "parent_section": "3.4",
+      "page_start": 20,
+      "page_end": 21,
+      "image_path": null
+    },
+    {
+      "type": "figure",
+      "number": "10",
+      "title": "MDT GUI",
+      "content": "",
+      "parent_section": "3.4.2",
+      "page_start": 21,
+      "page_end": 21,
+      "image_path": "figure_10.jpeg"
+    },
+    {
+      "type": "section",
+      "number": "3.4.3",
+      "title": "EBTS Files",
+      "content": "",
+      "parent_section": "3.4",
+      "page_start": 11,
+      "page_end": 11,
+      "image_path": null
+    },
+    {
+      "type": "section",
+      "number": "3.4.3.1",
+      "title": "Opening EBTS Files",
+      "content": "To begin a new session, the user opens a pair of LFFS EBTS files or Images/CSV files (see Section 3.1.1 New Session). The LFFS files must meet the following requirements to be opened by MDT:\n\na. Valid Type-9 record, in accordance to ANSI/NIST-ITL 1-2011. b. Type-9 records encoded in the Extended Feature Set (EFS) Profile 2: Quick Minutia Search standard with data in Field Block 9.300-9.399. c. Valid Type-13 record, in accordance to ANSI/NIST-ITL 1-2011. d. Fingerprint image possessing 500 pixels per inch (ppi) resolution in field 13.999.\n\nThe Images/CSV must meet the following requirements to be opened by MDT:\n\na. Fingerprint image formatted as a valid 8-bit Bitmap (.bmp) file b. Fingerprint image possessing 500 pixels per inch (ppi) resolution c. Minutiae formatted as a valid CSV (.csv) file\n\nThe CSV file format is as follows:\n\nEach line will represent one fingerprint object and contain 8 elements each separated by a comma. Lines will end in windows end of line (EOL) \\r\\n\n\nUNCLASSIFIED\n\nThis document is a research report submitted to the U.S. Department of Justice. This report has not been published by the Department. Opinions or points of view expressed are those of the author(s) and do not necessarily reflect the official position or policies of the U.S. Department of Justice.\n\n--\n\n**Minutia Deviation Tool: SDD (v. 2.0)**\n\n**NIJ SSBT CoE**\n\nElements of an Object:\n\n- ObjectType this will hold C=Core D=Delta M=Minutia\n\n- X – The X coordinates in 10 micrometers\n\n- Y – The Y coordinates in 10 micrometers\n\n- Theta – Angle in EFS format\n\n- ThetaLeft – Angle in EFS format or -1 if not used for ObjectType\n\n- ThetaRight – Angle in EFS format or -1 if not used for ObjectType\n\n- RPU – Radius of uncertainty in EFS format\n\n- MinutiaType – E=Ridge Ending B=Bifurcation or nothing if not used for ObjectType\n\nExample CSV File: C,01844,01392,281,-1,-1,000, D,02012,02052,000,000,000,000, M,00249,00249,244,-1,-1,000,E M,00488,00264,232,-1,-1,000,B",
+      "parent_section": "3.4.3",
+      "page_start": 21,
+      "page_end": 22,
+      "image_path": null
+    },
+    {
+      "type": "section",
+      "number": "3.4.3.2",
+      "title": "Viewing EBTS Files",
+      "content": "The original EBTS files can be individually viewed by selecting _File_  _Summary_  _Summary_ _Baseline_ or _Summary Comparison_ from the top menu (see [1] in Figure 10). Upon selecting one of these actions, a new pop-up window appears that displays all EBTS fields in a structured text format. Figure 11 shows the EBTS Viewer window. This is modeled after the ANSI/NIST Viewer provided as part of the FBI Universal Latent Workstation software.",
+      "parent_section": "3.4.3",
+      "page_start": 22,
+      "page_end": 22,
+      "image_path": null
+    },
+    {
+      "type": "figure",
+      "number": "11",
+      "title": "EBTS Viewer Window",
+      "content": "UNCLASSIFIED\n\n\n\nThis document is a research report submitted to the U.S. Department of Justice. This report has not\nbeen published by the Department. Opinions or points of view expressed are those of the author(s)\nand do not necessarily reflect the official position or policies of the U.S. Department of Justice.\n\n\n\n\n--\n\n**Minutia Deviation Tool: SDD (v. 2.0)**\n\n**NIJ SSBT CoE**",
+      "parent_section": "3.4.3.2",
+      "page_start": 22,
+      "page_end": 23,
+      "image_path": "figure_11.jpeg"
+    },
+    {
+      "type": "section",
+      "number": "3.4.3.3",
+      "title": "MDT Use of EBTS Fields",
+      "content": "Upon opening a pair of EBTS files, MDT reads in the EBTS fields and writes them to the internal database for use in displaying information and performing calculations. Fields that are not explicitly used by MDT are saved as-is to corresponding database fields and left unchanged. Fields that are optional according to ANSI/NIST-ITL 1-2011 and EFS standards and are not present in the input EBTS files will result in a null value in the MDT database. The fields utilized by MDT for display, record keeping, or deviation calculations are shown in Table 1.",
+      "parent_section": "3.4.3",
+      "page_start": 23,
+      "page_end": 23,
+      "image_path": null
+    },
+    {
+      "type": "table",
+      "number": "1",
+      "title": "EBTS Fields Used By MDT",
+      "content": "**MDT uses described as “Title:” are information displayed above the fingerprint images.**\n\n|Type|Field|Field Name|MDT Use|\n|---|---|---|---|\n|Type-2|2.010a|Contributor Case ID Number|Title: SubjectID|\n|Type-9|9.300a-e|Region of Interest|Fingerprint image scale|\n||9.302a|Finger/Palm Position: Position Code|Title: Finger|\n||9.320a-c|Cores|Cores’ positions, angles|\n||9.321a-e|Deltas|Deltas’ positions, angles|\n||9.331a-d|Minutiae|Minutiae’s positions, angles|\n|Type-13|13.006|Horizontal Line Length|Image horizontal size|\n||13.007|Vertical Line Length|Image vertical size|\n||13.020|Comment|Title: Image File Name|\n||13.200|User Defined Field|Title: Device|",
+      "parent_section": "3.4.3.3",
+      "page_start": 23,
+      "page_end": 23,
+      "image_path": null
+    },
+    {
+      "type": "section",
+      "number": "3.4.3.4",
+      "title": "Exporting EBTS Files",
+      "content": "MDT allows a user to export the original Baseline or Comparison fingerprint image and minutiae as an LFFS EBTS file. The user takes this action by selecting _Export_  _Export Baseline_ _Original File_ or _Export Comparison Original File_ from the top menu (see [1] in Figure 10). These actions write the internal MDT database fields associated with the EBTS fields to a new\n\nLFFS output file. All fields are unchanged from when they were originally input to MDT.",
+      "parent_section": "3.4.3",
+      "page_start": 23,
+      "page_end": 23,
+      "image_path": null
+    },
+    {
+      "type": "section",
+      "number": "3.4.4",
+      "title": "Exporting Deviation Log File",
+      "content": "The MDT allows a user to export a _Deviation Log_ as a text file containing a log of minutiae pairs with their characteristic details and the resulting deviation calculations from the current user session. The user selects _Export_  _Export Complete Deviation Log (CSV)_ from the main menu\n\n[1]. A pop-up window appears with a drop-down menu listing available deviation calculation modules. In the current MDT build, only a _Cartesian Deviation Calculation_ option is available. Upon clicking _OK,_ a CSV text file of the _Deviation Log_ will be saved to the local computer. The text file is in a table structured format suitable for viewing in a common office spreadsheet software program (e.g., Microsoft (MS) Excel). The _Deviation Log_ possesses the following information, suitable for analysis or reporting in external formats, as well as verifying the calculations:\n\nUNCLASSIFIED\n\nThis document is a research report submitted to the U.S. Department of Justice. This report has not been published by the Department. Opinions or points of view expressed are those of the author(s) and do not necessarily reflect the official position or policies of the U.S. Department of Justice.\n\n--\n\n**Minutia Deviation Tool: SDD (v. 2.0)**\n\n**NIJ SSBT CoE**\n\n- Baseline minutia details – X BM, Y BM, θ BM, BType\n\n- Baseline center point – X BC, Y BC, ϕ BC\n\n- Comparison minutia details – X CM, Y CM, θ CM, CType\n\n- Comparison center point – X CC, Y CC, ϕ CC\n\n- Relative deviations – ΔX R, ΔY R, Δθ R\n\n- Absolute deviations – ΔX A, ΔY A, Δθ A, D.\n\nEach resulting row of data in the _Deviation Log_ therefore includes: X BM, Y BM, θ BM, BType, X BC, Y BC, ϕ BC, X CM, Y CM, θ CM, CType, X CC, Y CC, ϕ CC, ΔX R, ΔY R, Δθ R, ΔX A, ΔY A, Δθ A, D.",
+      "parent_section": "3.4",
+      "page_start": 23,
+      "page_end": 24,
+      "image_path": null
+    },
+    {
+      "type": "section",
+      "number": "3.4.5",
+      "title": "Exporting History File",
+      "content": "The MDT allows a user to export the _History_ as a text file containing a log of any actions taken within the session by the user that resulted in a change state. The user selects _Export_  _Export_ _History Logs_ from the main menu [1]. The text file is in a space-delimited table structured format suitable for viewing in a common office spreadsheet software program (e.g., MS Excel).\n\n- The first information item is the local date and time of the action recorded as\n\n**MM/DD/YYYY hh:mm:ss** .\n\n- The second information item is the process description (i.e., **Action Taken** ).\n\nExample _History_ entries would therefore appear as: [3/5/2015 7:53:19 PM] New Session Loaded Or\n\n[3/5/2015 7:58:43 PM] Mated: Minutiae (1427,1646)@232° type=Bifurcation RPU=0, Minutiae (1509,1666)@254° type=Bifurcation RPU=0\n\nActions written to the _History_ include:\n\n- Opening EBTS files due to _New Session_\n\n- MDT populating and displaying minutiae from EBTS files\n\n- Selecting center points\n\n- Selecting a minutia point, with the action entry displaying all minutia details\n\n- Recording a minutia pair to the _Mated_ log, with the action entry displaying all minutiae details\n\n- _Save Session_\n\n- _Export Deviation Log_\n\n- _Export History_\n\n- _Export Original EBTS Files_\n\n- _Exporting Filtered Deviation Log or EBTS Files_\n\nUNCLASSIFIED\n\nThis document is a research report submitted to the U.S. Department of Justice. This report has not been published by the Department. Opinions or points of view expressed are those of the author(s) and do not necessarily reflect the official position or policies of the U.S. Department of Justice.\n\n--\n\n**Minutia Deviation Tool: SDD (v. 2.0)**\n\n**NIJ SSBT CoE**",
+      "parent_section": "3.4",
+      "page_start": 24,
+      "page_end": 25,
+      "image_path": null
+    },
+    {
+      "type": "figure",
+      "number": "12",
+      "title": "History Window",
+      "content": "",
+      "parent_section": "3.4.5",
+      "page_start": 25,
+      "page_end": 25,
+      "image_path": "figure_12.jpeg"
+    },
+    {
+      "type": "section",
+      "number": "3.4.6",
+      "title": "Session File",
+      "content": "The MDT allows a user to save a session file containing all the data from the original LFFS files, _Mated_ log, and _History_ log. This file enables MDT to save a session, open it at a later instance of the software, and resume viewing and/or analysis of the contained fingerprint images and minutia data. The _Session_ file (i.e., MDT Comparison file, *.MDTS) is not readable by external or third-party, but is solely intended as a method of preserving the necessary internal data for continuing a MDT session. The _Session_ file is a wrapper that contains the following:\n\n- Baseline LFFS file or Image/CSV files\n\n- Comparison LFFS file or Image/CSV files\n\n- _Mated_ log\n\n- _History_ log\n\n- Framework for correlating data elements within the four other files and reconstructing the sequential log and user actions within the session to-date",
+      "parent_section": "3.4",
+      "page_start": 25,
+      "page_end": 25,
+      "image_path": null
+    },
+    {
+      "type": "section",
+      "number": "3.5",
+      "title": "Security and Privacy Design",
+      "content": "a. MDT does not provide per-user security setting. b. MDT operates in a standard DoD Information System (IS) Environment.",
+      "parent_section": "3",
+      "page_start": 25,
+      "page_end": 25,
+      "image_path": null
+    },
+    {
+      "type": "section",
+      "number": "3.6",
+      "title": "CSCI Environment Design",
+      "content": "a. MDT operates in an office environment.",
+      "parent_section": "3",
+      "page_start": 25,
+      "page_end": 25,
+      "image_path": null
+    },
+    {
+      "type": "section",
+      "number": "3.7",
+      "title": "Computer Resource Design",
+      "content": "",
+      "parent_section": "3",
+      "page_start": 25,
+      "page_end": 25,
+      "image_path": null
+    },
+    {
+      "type": "section",
+      "number": "3.7.1",
+      "title": "Computer Hardware Design",
+      "content": "a. MDT operates on a standard Government desktop computer.",
+      "parent_section": "3.7",
+      "page_start": 25,
+      "page_end": 25,
+      "image_path": null
+    },
+    {
+      "type": "section",
+      "number": "3.7.2",
+      "title": "Computer Hardware Resource Utilization Design",
+      "content": "a. MDT requires a minimum 100 Megabytes (MB) of RAM.\n\nUNCLASSIFIED\n\nThis document is a research report submitted to the U.S. Department of Justice. This report has not been published by the Department. Opinions or points of view expressed are those of the author(s) and do not necessarily reflect the official position or policies of the U.S. Department of Justice.\n\n--\n\n**Minutia Deviation Tool: SDD (v. 2.0)**\n\n**NIJ SSBT CoE**\n\nb. MDT requires a minimum 200 MB hard drive.",
+      "parent_section": "3.7",
+      "page_start": 25,
+      "page_end": 26,
+      "image_path": null
+    },
+    {
+      "type": "section",
+      "number": "3.7.3",
+      "title": "Computer Software Design",
+      "content": "a. MDT runs in the MS Windows 7 operating system. b. MDT requires MS .Net Framework 4.",
+      "parent_section": "3.7",
+      "page_start": 26,
+      "page_end": 26,
+      "image_path": null
+    },
+    {
+      "type": "section",
+      "number": "3.7.4",
+      "title": "Computer Communications Design",
+      "content": "a. MDT does not provide any network functionality.",
+      "parent_section": "3.7",
+      "page_start": 26,
+      "page_end": 26,
+      "image_path": null
+    },
+    {
+      "type": "section",
+      "number": "3.8",
+      "title": "Software Quality Design",
+      "content": "The MDT development will follow object oriented development practices. The MDT will attempt to be as modular as possible. The design whenever possible will utilize library to promote code reuse. The code will be commented with at least each class/method documented. No standard variable naming convention will be used due to the use of various libraries.",
+      "parent_section": "3",
+      "page_start": 26,
+      "page_end": 26,
+      "image_path": null
+    },
+    {
+      "type": "section",
+      "number": "3.9",
+      "title": "Implementation Design",
+      "content": "",
+      "parent_section": "3",
+      "page_start": 26,
+      "page_end": 26,
+      "image_path": null
+    },
+    {
+      "type": "section",
+      "number": "3.9.1",
+      "title": "Hardware Design",
+      "content": "The hardware/operating system for the MDT must meet the following minimal system requirements:\n\na. MS Windows 7 or higher b. X86 Dual Core Processor\n\nc. 2 Gigabytes (GB) Memory d. 30 GB Hard drive",
+      "parent_section": "3.9",
+      "page_start": 26,
+      "page_end": 26,
+      "image_path": null
+    },
+    {
+      "type": "section",
+      "number": "3.9.2",
+      "title": "Software Design",
+      "content": "a. MDT executes on a Windows 7 or higher compatible computer system. b. MDT uses a Windows Standard user interface.\n\nc. MDT software is written using the C# computer language.",
+      "parent_section": "3.9",
+      "page_start": 26,
+      "page_end": 26,
+      "image_path": null
+    },
+    {
+      "type": "section",
+      "number": "3.10",
+      "title": "Personnel-Related Design",
+      "content": "There are no personnel-related design elements.",
+      "parent_section": "3",
+      "page_start": 26,
+      "page_end": 26,
+      "image_path": null
+    },
+    {
+      "type": "section",
+      "number": "3.11",
+      "title": "Training-Related Requirements",
+      "content": "There are no training-related design elements.",
+      "parent_section": "3",
+      "page_start": 26,
+      "page_end": 26,
+      "image_path": null
+    },
+    {
+      "type": "section",
+      "number": "3.12",
+      "title": "Logistics-Related Requirements",
+      "content": "There are no logistics-related design elements.\n\nUNCLASSIFIED\n\nThis document is a research report submitted to the U.S. Department of Justice. This report has not been published by the Department. Opinions or points of view expressed are those of the author(s) and do not necessarily reflect the official position or policies of the U.S. Department of Justice.\n\n--\n\n**Minutia Deviation Tool: SDD (v. 2.0)**\n\n**NIJ SSBT CoE**",
+      "parent_section": "3",
+      "page_start": 26,
+      "page_end": 27,
+      "image_path": null
+    },
+    {
+      "type": "section",
+      "number": "3.13",
+      "title": "Other Requirements",
+      "content": "There are no other design elements.\n\nUNCLASSIFIED\n\nThis document is a research report submitted to the U.S. Department of Justice. This report has not been published by the Department. Opinions or points of view expressed are those of the author(s) and do not necessarily reflect the official position or policies of the U.S. Department of Justice.\n\n--\n\n**Minutia Deviation Tool: SDD (v. 2.0)**\n\n**NIJ SSBT CoE**",
+      "parent_section": "3",
+      "page_start": 27,
+      "page_end": 28,
+      "image_path": null
+    },
+    {
+      "type": "section",
+      "number": "4.0",
+      "title": "CSCI ARCHITECTURAL DESIGN",
+      "content": "The overall architectural design of the MDT has been previously described in Section 3.0 CSCIWIDE DESIGN DECISIONS from a usability and capability perspective.\n\nIn addition, the software development will be conducted in C# utilizing Visual Studio 2010. This development suite provides the ability to take coding commentary produced throughout the development cycle and export it in a structured and organized manner that provides a complete and integrated documentation and architectural design. A later version of the MDT SDD will incorporate these outputs in this section.\n\nUNCLASSIFIED\n\nThis document is a research report submitted to the U.S. Department of Justice. This report has not been published by the Department. Opinions or points of view expressed are those of the author(s) and do not necessarily reflect the official position or policies of the U.S. Department of Justice.\n\n--\n\n**Minutia Deviation Tool: SDD (v. 2.0)**\n\n**NIJ SSBT CoE**",
+      "parent_section": "4",
+      "page_start": 28,
+      "page_end": 29,
+      "image_path": null
+    },
+    {
+      "type": "section",
+      "number": "5.0",
+      "title": "CSCI DETAILED DESIGN",
+      "content": "Due to the research-focused prototype nature of the MDT, a detailed design description of the MDT is not included in this SDD version.\n\nUNCLASSIFIED\n\nThis document is a research report submitted to the U.S. Department of Justice. This report has not been published by the Department. Opinions or points of view expressed are those of the author(s) and do not necessarily reflect the official position or policies of the U.S. Department of Justice.\n\n--\n\n**Minutia Deviation Tool: SDD (v. 2.0)**\n\n**NIJ SSBT CoE**",
+      "parent_section": "5",
+      "page_start": 29,
+      "page_end": 30,
+      "image_path": null
+    },
+    {
+      "type": "section",
+      "number": "6.0",
+      "title": "REQUIREMENTS TRACEABILITY",
+      "content": "",
+      "parent_section": "6",
+      "page_start": 30,
+      "page_end": 30,
+      "image_path": null
+    },
+    {
+      "type": "table",
+      "number": "2",
+      "title": "Requirements Traceability Matrix",
+      "content": "|ID<br>No.|Req.<br>Type|SRS<br>Section|Requirement|SDD<br>Section|\n|---|---|---|---|---|\n|01|T|3.2.1.a,<br>3.3.2.a,<br>3.3.2.b,<br>3.3.2.c,<br>3.3.2.d|Open a pair of LFFS EBTS files for display within the<br>GUI|3.1.1,<br>3.4.1.a,<br>3.4.2, 3.4.3.1|\n|02|T|3.2.1.b|Display fingerprint image|3.1.3, 3.4.2|\n|03|T|3.2.1.c|Overlay minutiae on a fingerprint in a GUI|3.1.3, 3.4.2|\n|04|T|3.2.1.d|Allow individual minutiae to be selected to display<br>details and annotations|3.1.5|\n|05|T|3.2.2.a|Calculate the spatial deviations between a pair of<br>minutiae selected on two fingerprints|3.2|\n|06|T|3.2.2.b|Present deviation results in a GUI window|3.2, 3.4.2|\n|07|O|3.2.3.a|Allow a user to filter minutiae|3.3|\n|08|O|3.2.3.b|Alter the displayed minutiae based on filter parameters|Not<br>Implemented|\n|09|O|3.2.3.c,<br>3.3.2.e|Write an EBTS file(s) with filter minutiae|3.4.3.4|\n|10|T|3.3.1.a|Provide a GUI|3.1|\n|11|T|3.3.1.b|Open files from the local computer|3.1.1, 3.1.2,<br>3.4.1.b|\n|12|T|3.3.1.c|Save a results file to the local computer|3.4.1.c|\n|13|O|3.3.2.c|Open a text file of Type-9 data and a second external<br>image file|3.1.1,<br>3.4.3.1|\n|14|T|3.3.3|Save a text file containing a log of minutiae pairs and<br>resulting deviation calculations|3.4.4|\n|15|T|3.3.4.a|Save a session file with data and actions from the<br>session|3.4.6|\n|16|T|3.3.4.b|Open a session file and resume viewing and/or<br>analysis|3.1.2|\n|17|T|3.8|Operate in a standard DoD IS Environment|3.5|\n|18|T|3.9|Operate in an office environment|3.6|\n|19|T|3.10.1|Operate on a standard Government desktop computer|3.7.1|\n|20|T|3.10.2.b|System possesses a minimum of 100 MB of RAM|3.7.2.a|\n|21|T|3.10.2.b|System possesses a minimum 200 MB hard drive|3.7.2.b|\n|22|T|3.10.3.a,<br>3.12.2.a|Runs in MS Windows 7 operating system|3.7.3.a,<br>3.9.2.a|\n|23|T|3.10.3.b|Utilizes MS .Net Framework 4|3.7.3.b|\n|24|T|3.10.4|Does not provide network functionality|3.7.4|\n|25|T|3.12.1.a|System possesses Windows 7 operating system|3.9.1.a|\n\n\nUNCLASSIFIED\n\n\n\n\n\n\nThis document is a research report submitted to the U.S. Department of Justice. This report has not\nbeen published by the Department. Opinions or points of view expressed are those of the author(s)\nand do not necessarily reflect the official position or policies of the U.S. Department of Justice.\n\n\n\n\n--\n\n**Minutia Deviation Tool: SDD (v. 2.0)**\n\n**NIJ SSBT CoE**\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n|ID<br>No.|Req.<br>Type|SRS<br>Section|Requirement|SDD<br>Section|\n|---|---|---|---|---|\n|26|T|3.12.1.b|System possesses X86 Dual Core Processor<br>(minimum)|3.9.1.b|\n|27|T|3.12.1.c|System possesses 2 GB of RAM (minimum)|3.9.1.c|\n|28|T|3.12.1.d|System possesses a 30 GB hard drive (minimum)|3.9.1.d|\n|29|O|N/A|View an open EBTS file’s text fields in a pop-up<br>window.|3.4.3.2|\n|30|O|N/A|Save a text file containing actions taken during the<br>active session|3.4.5|\n\n\nUNCLASSIFIED\n\n\n\nThis document is a research report submitted to the U.S. Department of Justice. This report has not\nbeen published by the Department. Opinions or points of view expressed are those of the author(s)\nand do not necessarily reflect the official position or policies of the U.S. Department of Justice.\n\n\n\n\n\n\n--",
+      "parent_section": "6.0",
+      "page_start": 30,
+      "page_end": 31,
+      "image_path": null
+    },
+    {
+      "type": "section",
+      "number": "7.0",
+      "title": "NOTES",
+      "content": "**Minutia Deviation Tool: SDD (v. 2.0)**\n\n**NIJ SSBT CoE**",
+      "parent_section": "7",
+      "page_start": 32,
+      "page_end": 32,
+      "image_path": null
+    },
+    {
+      "type": "table",
+      "number": "3",
+      "title": "Acronyms and Abbreviations",
+      "content": "|ACRONYM|DESCRIPTION|\n|---|---|\n|**ASD(R&E)**|Assistant Secretary of Defense for Research and Engineering|\n|**AT&L**|Acquisition, Technology, and Logistics|\n|||\n|**BMP**|Bitmap|\n|||\n|**CoE**|Center of Excellence|\n|**CSCI**|Computer Software Configuration Item|\n|**CSV**|Comma-Separated Value|\n|||\n|**DOD**|Department of Defense|\n|**DOJ**|Department of Justice|\n|||\n|**EBTS**|Electronic Biometrics Specification Transmission|\n|**EFS**|Extended Feature Set|\n|**EOL**|End of Line|\n|||\n|**FBI**|Federal Bureau of Investigation|\n|||\n|**GB**|Gigabyte|\n|**GUI**|Graphical User Interface|\n|||\n|**LFFS**|Latent Friction Ridge Features Search|\n|||\n|**MASI**|ManTech Advanced Systems International|\n|**MB**|Megabyte|\n|**MDT**|Minutia Deviation Tool|\n|**MDTS**|MDT Session file|\n|||\n|**NIJ**|National Institute of Justice|\n|**NIST**|National Institute of Standards and Technology|\n|**NLECTC**|National Law Enforcement and Corrections Technology Center|\n|||\n|**OSD**|Office of the Secretary of Defense|\n|||\n|**Ppi**|Pixels Per Inch|\n|||\n|**SDD**|Software Design Description|\n|**SRS**|Software Requirements Specification|\n|**SSBT**|Sensor, Surveillance, and Biometric Technologies|\n\n\nUNCLASSIFIED\n\n\n\nThis document is a research report submitted to the U.S. Department of Justice. This report has not\nbeen published by the Department. Opinions or points of view expressed are those of the author(s)\nand do not necessarily reflect the official position or policies of the U.S. Department of Justice.",
+      "parent_section": "7.0",
+      "page_start": 32,
+      "page_end": 32,
+      "image_path": null
+    }
+  ],
+  "summary": {
+    "total_chunks": 65,
+    "sections": 50,
+    "tables": 3,
+    "figures": 12
+  },
+  "debug_info": {
+    "file_name": "2761d4858ee6f29c.pdf",
+    "file_size_bytes": 1855093,
+    "preprocessed_used": true,
+    "markdown_chars": 57340,
+    "page_range": null,
+    "boilerplate_lines_removed": 55
+  }
+}
